@@ -11,6 +11,23 @@ local deathcon
 local tooltipmessage
 local characterposition
 
+--// Functions (moved up to fix scope issues)
+FindChildOfClass = function(parent, classname)
+    return parent:FindFirstChildOfClass(classname)
+end
+FindChild = function(parent, child)
+    return parent:FindFirstChild(child)
+end
+FindChildOfType = function(parent, childname, classname)
+    local child = parent:FindFirstChild(childname)
+    if child and child.ClassName == classname then
+        return child
+    end
+end
+CheckFunc = function(func)
+    return typeof(func) == 'function'
+end
+
 --// Load Teleport System V2 from GitHub
 local TeleportSystemV2
 local teleportURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/teleport-v2.lua"
@@ -76,23 +93,6 @@ for i,v in pairs(TeleportLocations['Zones']) do
 end
 for i,v in pairs(TeleportLocations['Rods']) do 
     table.insert(RodNames, i) 
-end
-
---// Functions
-FindChildOfClass = function(parent, classname)
-    return parent:FindFirstChildOfClass(classname)
-end
-FindChild = function(parent, child)
-    return parent:FindFirstChild(child)
-end
-FindChildOfType = function(parent, childname, classname)
-    child = parent:FindFirstChild(childname)
-    if child and child.ClassName == classname then
-        return child
-    end
-end
-CheckFunc = function(func)
-    return typeof(func) == 'function'
 end
 
 --// Custom Functions
@@ -406,6 +406,10 @@ local BatchTeleportButton = TeleportsTab:CreateButton({
         end
         
         TeleportSystemV2.batchTeleport(locations, 2, method)
+        message("🚀 Batch teleport started for " .. category, 3)
+    end,
+})
+
 TeleportsTab:CreateSection({Name = "Search & Statistics"})
 
 local SearchButton = TeleportsTab:CreateButton({
@@ -651,7 +655,7 @@ RunService.Heartbeat:Connect(function()
     
     if Rayfield.Flags['fishabundance'] then
         if not fishabundancevisible then
-            message('\<b><font color = \"#9eff80\">Fish Abundance Zones</font></b>\ are now visible', 5)
+            message('\\<b><font color = \"#9eff80\">Fish Abundance Zones</font></b>\\ are now visible', 5)
         end
         for i,v in workspace.zones.fishing:GetChildren() do
             if FindChildOfType(v, 'Abundance', 'StringValue') and FindChildOfType(v, 'radar1', 'BillboardGui') then
@@ -662,7 +666,7 @@ RunService.Heartbeat:Connect(function()
         fishabundancevisible = Rayfield.Flags['fishabundance']
     else
         if fishabundancevisible then
-            message('\<b><font color = \"#9eff80\">Fish Abundance Zones</font></b>\ are no longer visible', 5)
+            message('\\<b><font color = \"#9eff80\">Fish Abundance Zones</font></b>\\ are no longer visible', 5)
         end
         for i,v in workspace.zones.fishing:GetChildren() do
             if FindChildOfType(v, 'Abundance', 'StringValue') and FindChildOfType(v, 'radar1', 'BillboardGui') then
