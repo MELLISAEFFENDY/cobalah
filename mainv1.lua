@@ -32,7 +32,7 @@ end
 local TeleportSystemV2
 local teleportURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/teleport-v2.lua"
 
--- Try to load from GitHub first, fallback to local if needed
+-- Load from GitHub only
 local success, result = pcall(function()
     return loadstring(game:HttpGet(teleportURL))()
 end)
@@ -41,13 +41,7 @@ if success and result then
     TeleportSystemV2 = result
     print("✅ Teleport System V2 loaded from GitHub successfully!")
 else
-    print("⚠️ Failed to load from GitHub, trying local file...")
-    if CheckFunc(loadfile) then
-        TeleportSystemV2 = loadfile('d:/fishchcoba/teleport-v2.lua')()
-    else
-        TeleportSystemV2 = loadstring(readfile('d:/fishchcoba/teleport-v2.lua'))()
-    end
-    print("✅ Teleport System V2 loaded from local file!")
+    error("❌ Failed to load Teleport System V2 from GitHub. Error: " .. tostring(result))
 end
 
 -- Initialize the teleport system
@@ -125,7 +119,7 @@ end
 local Rayfield
 local rayfieldURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/rayfield.lua"
 
--- Try to load from GitHub first, fallback to local if needed
+-- Load from GitHub only
 local success, result = pcall(function()
     return loadstring(game:HttpGet(rayfieldURL))()
 end)
@@ -134,39 +128,56 @@ if success and result then
     Rayfield = result
     print("✅ Rayfield UI loaded from GitHub successfully!")
 else
-    print("⚠️ Failed to load Rayfield from GitHub, trying local file...")
-    if CheckFunc(loadfile) then
-        Rayfield = loadfile('d:/fishchcoba/rayfield.lua')()
-    else
-        Rayfield = loadstring(readfile('d:/fishchcoba/rayfield.lua'))()
-    end
-    print("✅ Rayfield UI loaded from local file!")
+    error("❌ Failed to load Rayfield UI from GitHub. Error: " .. tostring(result))
 end
 
 --// Load Advanced Inventory Exploits from GitHub
 local InventoryExploits
 local inventoryURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/advanced_inventory_exploits.lua"
 
--- Try to load from GitHub first, fallback to local if needed
+-- Load from GitHub only
 local success2, result2 = pcall(function()
     return loadstring(game:HttpGet(inventoryURL))()
 end)
 
 if success2 and result2 then
     InventoryExploits = result2
-    InventoryExploits:Initialize()
-    print("✅ Advanced Inventory Exploits loaded from GitHub successfully!")
-else
-    print("⚠️ Failed to load Inventory Exploits from GitHub, trying local file...")
-    if CheckFunc(loadfile) then
-        InventoryExploits = loadfile('d:/fishchcoba/advanced_inventory_exploits.lua')()
+    if InventoryExploits and typeof(InventoryExploits) == "table" and InventoryExploits.Initialize then
+        local initSuccess, initError = pcall(function()
+            InventoryExploits:Initialize()
+        end)
+        if initSuccess then
+            print("✅ Advanced Inventory Exploits loaded from GitHub successfully!")
+        else
+            print("⚠️ Inventory Exploits loaded but failed to initialize:", initError)
+            InventoryExploits = nil
+        end
     else
-        InventoryExploits = loadstring(readfile('d:/fishchcoba/advanced_inventory_exploits.lua'))()
+        print("⚠️ Inventory Exploits loaded but is not a valid module")
+        InventoryExploits = nil
     end
-    if InventoryExploits then
-        InventoryExploits:Initialize()
-        print("✅ Advanced Inventory Exploits loaded from local file!")
-    end
+else
+    error("❌ Failed to load Advanced Inventory Exploits from GitHub. Error: " .. tostring(result2))
+end
+
+--// Load Economy & Marketplace Exploits from GitHub
+local EconomyExploits
+local economyURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/economy_marketplace_exploits.lua"
+
+-- Try to load from GitHub first, fallback gracefully
+local success3, result3 = pcall(function()
+    return loadstring(game:HttpGet(economyURL))()
+end)
+
+if success3 and result3 then
+    EconomyExploits = result3
+    EconomyExploits:Initialize()
+    print("✅ Economy & Marketplace Exploits loaded from GitHub successfully!")
+else
+    print("⚠️ Failed to load Economy Exploits from GitHub")
+    print("⚠️ Error:", result3 or "Unknown error")
+    -- Set EconomyExploits to nil so we can handle it gracefully in UI
+    EconomyExploits = nil
 end
 
 --// Create UI
@@ -182,6 +193,7 @@ local ModificationsTab = Window:CreateTab({Name = "Modifications"})
 local TeleportsTab = Window:CreateTab({Name = "Teleports"})
 local VisualsTab = Window:CreateTab({Name = "Visuals"})
 local InventoryTab = Window:CreateTab({Name = "Inventory"})
+local EconomyTab = Window:CreateTab({Name = "Economy"})
 
 --// Automation Tab
 AutomationTab:CreateSection({Name = "Autofarm"})
@@ -727,6 +739,238 @@ else
         Name = "❌ Inventory Module Failed to Load",
         Callback = function()
             message("❌ Advanced Inventory Exploits module failed to load from GitHub", 5)
+        end,
+    })
+end
+
+--// Economy Tab
+if EconomyExploits then
+    EconomyTab:CreateSection({Name = "Market Operations"})
+
+    local MarketPriceManipulatorToggle = EconomyTab:CreateToggle({
+        Name = "Market Price Manipulator",
+        CurrentValue = false,
+        Flag = "marketpricemanipulator",
+        Callback = function(Value)
+            if Value then
+                EconomyExploits:StartMarketPriceManipulator()
+                message("💰 Market Price Manipulator Started", 3)
+            else
+                EconomyExploits:StopMarketPriceManipulator()
+                message("⛔ Market Price Manipulator Stopped", 3)
+            end
+        end,
+    })
+
+    local ShopRefreshToggle = EconomyTab:CreateToggle({
+        Name = "Unlimited Shop Refresh",
+        CurrentValue = false,
+        Flag = "shoprefresh",
+        Callback = function(Value)
+            if Value then
+                EconomyExploits:StartUnlimitedShopRefresh()
+                message("🔄 Unlimited Shop Refresh Started", 3)
+            else
+                EconomyExploits:StopUnlimitedShopRefresh()
+                message("⛔ Shop Refresh Stopped", 3)
+            end
+        end,
+    })
+
+    local FreePurchaseToggle = EconomyTab:CreateToggle({
+        Name = "Free Purchase Exploit",
+        CurrentValue = false,
+        Flag = "freepurchase",
+        Callback = function(Value)
+            if Value then
+                EconomyExploits:StartFreePurchaseExploit()
+                message("💸 Free Purchase Exploit Started", 3)
+            else
+                EconomyExploits:StopFreePurchaseExploit()
+                message("⛔ Free Purchase Stopped", 3)
+            end
+        end,
+    })
+
+    EconomyTab:CreateSection({Name = "Trading & Marketplace"})
+
+    local ItemFlipperToggle = EconomyTab:CreateToggle({
+        Name = "Auto Item Flipper",
+        CurrentValue = false,
+        Flag = "itemflipper",
+        Callback = function(Value)
+            if Value then
+                EconomyExploits:StartAutoItemFlipper()
+                message("📈 Auto Item Flipper Started", 3)
+            else
+                EconomyExploits:StopAutoItemFlipper()
+                message("⛔ Item Flipper Stopped", 3)
+            end
+        end,
+    })
+
+    local ShopScannerToggle = EconomyTab:CreateToggle({
+        Name = "Shop Inventory Scanner",
+        CurrentValue = false,
+        Flag = "shopscanner",
+        Callback = function(Value)
+            if Value then
+                EconomyExploits:StartShopInventoryScanner()
+                message("🔍 Shop Scanner Started", 3)
+            else
+                EconomyExploits:StopShopInventoryScanner()
+                message("⛔ Shop Scanner Stopped", 3)
+            end
+        end,
+    })
+
+    EconomyTab:CreateSection({Name = "Configuration"})
+
+    local MaxSpendDropdown = EconomyTab:CreateDropdown({
+        Name = "Max Spend Amount",
+        Options = {"10000", "50000", "100000", "500000", "1000000"},
+        CurrentOption = "100000",
+        Flag = "maxspend",
+        Callback = function(Option)
+            EconomyExploits.Config.MaxSpendAmount = tonumber(Option)
+            message("💰 Max spend set to $" .. Option, 2)
+        end,
+    })
+
+    local ProfitMarginDropdown = EconomyTab:CreateDropdown({
+        Name = "Min Profit Margin",
+        Options = {"10%", "20%", "30%", "50%", "100%"},
+        CurrentOption = "20%",
+        Flag = "profitmargin",
+        Callback = function(Option)
+            local margin = tonumber(Option:gsub("%%", "")) / 100
+            EconomyExploits.Config.MinProfitMargin = margin
+            message("📊 Min profit margin set to " .. Option, 2)
+        end,
+    })
+
+    local RefreshDelayDropdown = EconomyTab:CreateDropdown({
+        Name = "Refresh Delay",
+        Options = {"0.1", "0.5", "1.0", "2.0", "5.0"},
+        CurrentOption = "0.1",
+        Flag = "refreshdelay",
+        Callback = function(Option)
+            EconomyExploits.Config.RefreshDelay = tonumber(Option)
+            message("⏱️ Refresh delay set to " .. Option .. "s", 2)
+        end,
+    })
+
+    EconomyTab:CreateSection({Name = "Quick Actions"})
+
+    local RefreshAllShopsButton = EconomyTab:CreateButton({
+        Name = "🔄 Refresh All Shops",
+        Callback = function()
+            EconomyExploits:RefreshAllShops()
+            message("🔄 All shops refreshed!", 3)
+        end,
+    })
+
+    local ScanForDealsButton = EconomyTab:CreateButton({
+        Name = "🔍 Scan for Deals",
+        Callback = function()
+            EconomyExploits:ScanForFlipOpportunities()
+            message("🔍 Scanning for profitable deals...", 3)
+        end,
+    })
+
+    local AttemptFreePurchasesButton = EconomyTab:CreateButton({
+        Name = "💸 Attempt Free Purchases",
+        Callback = function()
+            EconomyExploits:AttemptFreePurchases()
+            message("💸 Attempting free purchases...", 3)
+        end,
+    })
+
+    local ManipulatePricesButton = EconomyTab:CreateButton({
+        Name = "💰 Manipulate Prices",
+        Callback = function()
+            EconomyExploits:ManipulateMarketPrices()
+            message("💰 Attempting price manipulation...", 3)
+        end,
+    })
+
+    EconomyTab:CreateSection({Name = "Control Center"})
+
+    local StartAllEconomyButton = EconomyTab:CreateButton({
+        Name = "🚀 Start All Economy Systems",
+        Callback = function()
+            EconomyExploits:StartAllSystems()
+            message("🚀 All economy systems started!", 3)
+            
+            -- Update UI toggles
+            Rayfield.Flags["marketpricemanipulator"] = true
+            Rayfield.Flags["shoprefresh"] = true
+            Rayfield.Flags["freepurchase"] = true
+            Rayfield.Flags["itemflipper"] = true
+            Rayfield.Flags["shopscanner"] = true
+        end,
+    })
+
+    local StopAllEconomyButton = EconomyTab:CreateButton({
+        Name = "⛔ Stop All Economy Systems",
+        Callback = function()
+            EconomyExploits:StopAllSystems()
+            message("⛔ All economy systems stopped!", 3)
+            
+            -- Update UI toggles
+            Rayfield.Flags["marketpricemanipulator"] = false
+            Rayfield.Flags["shoprefresh"] = false
+            Rayfield.Flags["freepurchase"] = false
+            Rayfield.Flags["itemflipper"] = false
+            Rayfield.Flags["shopscanner"] = false
+        end,
+    })
+
+    local EconomyStatusButton = EconomyTab:CreateButton({
+        Name = "📊 Show Economy Status",
+        Callback = function()
+            local status = EconomyExploits:GetStatus()
+            local msg = "📊 Economy Status:\n\n"
+            msg = msg .. "💰 Price Manipulator: " .. (status.MarketPriceManipulator and "ON" or "OFF") .. "\n"
+            msg = msg .. "🔄 Shop Refresh: " .. (status.UnlimitedShopRefresh and "ON" or "OFF") .. "\n"
+            msg = msg .. "📈 Item Flipper: " .. (status.AutoItemFlipper and "ON" or "OFF") .. "\n"
+            msg = msg .. "💸 Free Purchase: " .. (status.FreePurchaseExploit and "ON" or "OFF") .. "\n"
+            msg = msg .. "🔍 Shop Scanner: " .. (status.ShopInventoryScanner and "ON" or "OFF") .. "\n\n"
+            msg = msg .. "💵 Max Spend: $" .. (EconomyExploits.Config.MaxSpendAmount or 0) .. "\n"
+            msg = msg .. "📊 Min Profit: " .. string.format("%.0f%%", (EconomyExploits.Config.MinProfitMargin or 0) * 100)
+            message(msg, 10)
+        end,
+    })
+
+    local MarketReportButton = EconomyTab:CreateButton({
+        Name = "📈 Generate Market Report",
+        Callback = function()
+            EconomyExploits:PrintMarketReport()
+            message("📈 Market report generated in console", 5)
+        end,
+    })
+
+    local EmergencyEconomyStopButton = EconomyTab:CreateButton({
+        Name = "🚨 EMERGENCY STOP",
+        Callback = function()
+            EconomyExploits:EmergencyStop()
+            message("🚨 ECONOMY EMERGENCY STOP ACTIVATED!", 5)
+            
+            -- Reset all UI toggles
+            Rayfield.Flags["marketpricemanipulator"] = false
+            Rayfield.Flags["shoprefresh"] = false
+            Rayfield.Flags["freepurchase"] = false
+            Rayfield.Flags["itemflipper"] = false
+            Rayfield.Flags["shopscanner"] = false
+        end,
+    })
+else
+    EconomyTab:CreateSection({Name = "Error"})
+    
+    local EconomyErrorLabel = EconomyTab:CreateButton({
+        Name = "❌ Economy Module Failed to Load",
+        Callback = function()
+            message("❌ Economy & Marketplace Exploits module failed to load from GitHub", 5)
         end,
     })
 end
