@@ -11,6 +11,32 @@ local deathcon
 local tooltipmessage
 local characterposition
 
+--// Load Teleport System V2 from GitHub
+local TeleportSystemV2
+local teleportURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/teleport-v2.lua"
+
+-- Try to load from GitHub first, fallback to local if needed
+local success, result = pcall(function()
+    return loadstring(game:HttpGet(teleportURL))()
+end)
+
+if success and result then
+    TeleportSystemV2 = result
+    print("✅ Teleport System V2 loaded from GitHub successfully!")
+else
+    print("⚠️ Failed to load from GitHub, trying local file...")
+    if CheckFunc(loadfile) then
+        TeleportSystemV2 = loadfile('d:/fishchcoba/teleport-v2.lua')()
+    else
+        TeleportSystemV2 = loadstring(readfile('d:/fishchcoba/teleport-v2.lua'))()
+    end
+    print("✅ Teleport System V2 loaded from local file!")
+end
+
+-- Initialize the teleport system
+TeleportSystemV2 = TeleportSystemV2.init()
+
+-- Legacy teleport locations for backward compatibility
 local TeleportLocations = {
     ['Zones'] = {
         ['Moosewood'] = CFrame.new(379.875458, 134.500519, 233.5495, -0.033920113, 8.13274355e-08, 0.999424577, 8.98441925e-08, 1, -7.83249803e-08, -0.999424577, 8.7135696e-08, -0.033920113),
@@ -95,12 +121,26 @@ message = function(text, time)
     end)
 end
 
---// Load Rayfield UI
+--// Load Rayfield UI from GitHub
 local Rayfield
-if CheckFunc(loadfile) then
-    Rayfield = loadfile('d:/fishchcoba/rayfield.lua')()
+local rayfieldURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/rayfield.lua"
+
+-- Try to load from GitHub first, fallback to local if needed
+local success, result = pcall(function()
+    return loadstring(game:HttpGet(rayfieldURL))()
+end)
+
+if success and result then
+    Rayfield = result
+    print("✅ Rayfield UI loaded from GitHub successfully!")
 else
-    Rayfield = loadstring(readfile('d:/fishchcoba/rayfield.lua'))()
+    print("⚠️ Failed to load Rayfield from GitHub, trying local file...")
+    if CheckFunc(loadfile) then
+        Rayfield = loadfile('d:/fishchcoba/rayfield.lua')()
+    else
+        Rayfield = loadstring(readfile('d:/fishchcoba/rayfield.lua'))()
+    end
+    print("✅ Rayfield UI loaded from local file!")
 end
 
 --// Create UI
@@ -218,7 +258,7 @@ local NoPeaksSystemsToggle = ModificationsTab:CreateToggle({
 })
 
 --// Teleports Tab
-TeleportsTab:CreateSection({Name = "Locations"})
+TeleportsTab:CreateSection({Name = "Legacy Locations"})
 
 local ZonesDropdown = TeleportsTab:CreateDropdown({
     Name = "Zones",
@@ -257,6 +297,156 @@ local TeleportToRodButton = TeleportsTab:CreateButton({
         if selectedRod and TeleportLocations['Rods'][selectedRod] then
             gethrp().CFrame = TeleportLocations['Rods'][selectedRod]
         end
+    end,
+})
+
+TeleportsTab:CreateSection({Name = "GPS System V2 (276 Locations)"})
+
+-- Get GPS categories and create dropdown
+local GPSCategories = TeleportSystemV2.getCategoryNames()
+local GPSCategoryDropdown = TeleportsTab:CreateDropdown({
+    Name = "GPS Categories",
+    Options = GPSCategories,
+    CurrentOption = GPSCategories[1],
+    Flag = "gpscategory",
+    Callback = function(Option)
+        -- Update location dropdown when category changes
+        local locations = TeleportSystemV2.getLocationNames(Option)
+        GPSLocationDropdown:Refresh(locations)
+        if #locations > 0 then
+            Rayfield.Flags["gpslocation"] = locations[1]
+        end
+    end,
+})
+
+-- Initial location names
+local initialLocations = TeleportSystemV2.getLocationNames(GPSCategories[1])
+local GPSLocationDropdown = TeleportsTab:CreateDropdown({
+    Name = "GPS Locations",
+    Options = initialLocations,
+    CurrentOption = initialLocations[1] or "No locations",
+    Flag = "gpslocation",
+    Callback = function(Option)
+        -- Show distance when location selected
+        local category = Rayfield.Flags["gpscategory"]
+        local locations = TeleportSystemV2.getLocationsByCategory(category)
+        for _, location in pairs(locations) do
+            if location.name == Option then
+                local distance = TeleportSystemV2.getDistanceToLocation(location)
+                message(string.format("📍 %s\n🗺️ Distance: %.0f studs", location.name, distance), 3)
+                break
+            end
+        end
+    end,
+})
+
+local TeleportMethodDropdown = TeleportsTab:CreateDropdown({
+    Name = "Teleport Method",
+    Options = {"CFrame", "TweenService", "RequestTeleportCFrame", "TeleportService"},
+    CurrentOption = "CFrame",
+    Flag = "teleportmethod",
+    Callback = function(Option)
+        -- Method selection callback
+    end,
+})
+
+local GPSTeleportButton = TeleportsTab:CreateButton({
+    Name = "🌍 GPS Teleport",
+    Callback = function()
+        local category = Rayfield.Flags["gpscategory"]
+        local locationName = Rayfield.Flags["gpslocation"] 
+        local method = Rayfield.Flags["teleportmethod"]
+        
+        if category and locationName then
+            local success, msg = TeleportSystemV2.teleportToLocation(locationName, category, method)
+            if success then
+                message("✅ " .. msg, 3)
+            else
+                message("❌ " .. msg, 3)
+            end
+        end
+    end,
+})
+
+local NearestLocationsButton = TeleportsTab:CreateButton({
+    Name = "📍 Find Nearest (5)",
+    Callback = function()
+        local category = Rayfield.Flags["gpscategory"]
+        local nearest = TeleportSystemV2.getNearestLocations(category, 5)
+        
+        local msg = "🔍 Nearest locations in " .. category .. ":\n"
+        for i, item in pairs(nearest) do
+            msg = msg .. string.format("%d. %s (%.0f studs)\n", i, item.location.name, item.distance)
+        end
+        message(msg, 8)
+    end,
+})
+
+TeleportsTab:CreateSection({Name = "Advanced Features"})
+
+local AutoTreasureButton = TeleportsTab:CreateButton({
+    Name = "🏴‍☠️ Auto Treasure Hunt",
+    Callback = function()
+        local method = Rayfield.Flags["teleportmethod"]
+        TeleportSystemV2.autoTreasureHunt(3, method)
+        message("🏴‍☠️ Auto Treasure Hunt started!", 3)
+    end,
+})
+
+local BatchTeleportButton = TeleportsTab:CreateButton({
+    Name = "🚀 Batch Teleport (Category)",
+    Callback = function()
+        local category = Rayfield.Flags["gpscategory"]
+        local method = Rayfield.Flags["teleportmethod"]
+        local locations = TeleportSystemV2.getLocationsByCategory(category)
+        
+        if #locations > 10 then
+            message("⚠️ Too many locations (" .. #locations .. "). Use smaller categories.", 5)
+            return
+        end
+        
+        TeleportSystemV2.batchTeleport(locations, 2, method)
+TeleportsTab:CreateSection({Name = "Search & Statistics"})
+
+local SearchButton = TeleportsTab:CreateButton({
+    Name = "🔍 Search Locations",
+    Callback = function()
+        -- Simple search implementation (could be enhanced with text input)
+        local searchTerm = "island" -- Example search term
+        local results = TeleportSystemV2.searchLocations(searchTerm)
+        
+        local msg = "🔍 Search results for '" .. searchTerm .. "':\n"
+        for i, result in pairs(results) do
+            if i <= 10 then -- Limit to 10 results
+                msg = msg .. string.format("%d. %s (%s)\n", i, result.name, result.category)
+            end
+        end
+        
+        if #results > 10 then
+            msg = msg .. "... and " .. (#results - 10) .. " more results"
+        end
+        
+        message(msg, 10)
+    end,
+})
+
+local StatsButton = TeleportsTab:CreateButton({
+    Name = "📊 Show GPS Statistics",
+    Callback = function()
+        local categories = TeleportSystemV2.getCategoryNames()
+        local totalLocations = 0
+        local msg = "📊 GPS System V2 Statistics:\n\n"
+        
+        for _, category in pairs(categories) do
+            local count = #TeleportSystemV2.getLocationsByCategory(category)
+            totalLocations = totalLocations + count
+            msg = msg .. string.format("📁 %s: %d locations\n", category, count)
+        end
+        
+        msg = msg .. string.format("\n🌍 Total Locations: %d\n", totalLocations)
+        msg = msg .. "🚀 Methods: " .. table.concat(TeleportSystemV2.teleportMethods, ", ")
+        
+        message(msg, 15)
     end,
 })
 
