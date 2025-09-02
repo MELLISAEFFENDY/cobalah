@@ -4,6 +4,16 @@ local ReplicatedStorage = cloneref(game:GetService('ReplicatedStorage'))
 local RunService = cloneref(game:GetService('RunService'))
 local GuiService = cloneref(game:GetService('GuiService'))
 
+--// Load Marketplace Module
+local MarketplaceModule
+pcall(function()
+    if loadfile and isfile and isfile('marketplace.lua') then
+        MarketplaceModule = loadfile('marketplace.lua')()
+    elseif readfile and isfile and isfile('marketplace.lua') then
+        MarketplaceModule = loadstring(readfile('marketplace.lua'))()
+    end
+end)
+
 --// Variables
 local flags = {}
 local characterposition
@@ -103,6 +113,7 @@ else
     library = loadstring(game:HttpGet('https://raw.githubusercontent.com/MELLISAEFFENDY/gamech/refs/heads/main/library.lua'))()
 end
 local Automation = library:CreateWindow('Automation')
+local Marketplace = library:CreateWindow('Marketplace')
 local Modifications = library:CreateWindow('Modifications')
 local Teleports = library:CreateWindow('Teleports')
 local Visuals = library:CreateWindow('Visuals')
@@ -112,6 +123,45 @@ Automation:Dropdown('Freeze Character Mode', {location = flags, flag = 'freezech
 Automation:Toggle('Auto Cast', {location = flags, flag = 'autocast'})
 Automation:Toggle('Auto Shake', {location = flags, flag = 'autoshake'})
 Automation:Toggle('Auto Reel', {location = flags, flag = 'autoreel'})
+-----
+Marketplace:Section('Trading System')
+Marketplace:Toggle('Auto Trading', {location = flags, flag = 'autotrading'})
+Marketplace:Toggle('Auto Shopping', {location = flags, flag = 'autoshopping'})
+Marketplace:Toggle('Price Monitoring', {location = flags, flag = 'pricemonitoring'})
+Marketplace:Section('Shop Management')
+Marketplace:Button('Open Daily Shop', function() 
+    if MarketplaceModule then MarketplaceModule:OpenDailyShop() end 
+end)
+Marketplace:Button('Refresh Daily Shop', function() 
+    if MarketplaceModule then MarketplaceModule:RefreshDailyShop() end 
+end)
+Marketplace:Button('Open Shell Merchant', function() 
+    if MarketplaceModule then MarketplaceModule:OpenShellMerchant() end 
+end)
+Marketplace:Section('Configuration')
+Marketplace:Box('Max Spend Amount', {location = flags, flag = 'maxspend', placeholder = '50000', type = 'number'})
+Marketplace:Slider('Min Profit Margin %', {location = flags, flag = 'profitmargin', min = 5, max = 50, default = 15})
+Marketplace:Toggle('Auto Refresh Shops', {location = flags, flag = 'autorefresh'})
+Marketplace:Dropdown('Trading Strategy', {location = flags, flag = 'strategy', list = {'Conservative', 'Balanced', 'Aggressive'}})
+Marketplace:Section('Auto Buy Settings')
+Marketplace:Box('Auto Buy Item', {location = flags, flag = 'autobuyitem', placeholder = 'Item Name'})
+Marketplace:Box('Max Price', {location = flags, flag = 'autobuyprice', placeholder = 'Max Price', type = 'number'})
+Marketplace:Button('Add to Auto Buy', function()
+    if MarketplaceModule and flags['autobuyitem'] and flags['autobuyprice'] then
+        MarketplaceModule:AddToAutoBuyList(flags['autobuyitem'], tonumber(flags['autobuyprice']) or 0)
+        message('Added ' .. flags['autobuyitem'] .. ' to auto-buy list', 3)
+    end
+end)
+Marketplace:Section('Quick Actions')
+Marketplace:Button('Emergency Stop All', function() 
+    if MarketplaceModule then MarketplaceModule:EmergencyStop() end 
+end)
+Marketplace:Button('Show Status', function() 
+    if MarketplaceModule then 
+        local status = MarketplaceModule:GetStatus()
+        message('Marketplace Status: Trading=' .. tostring(status.AutoTrading) .. ', Shopping=' .. tostring(status.AutoBuying), 5)
+    end 
+end)
 -----
 if CheckFunc(hookmetamethod) then
     Modifications:Section('Hooks')
@@ -138,6 +188,42 @@ Visuals:Toggle('Free Fish Radar', {location = flags, flag = 'fishabundance'})
 
 --// Loops
 RunService.Heartbeat:Connect(function()
+    -- Marketplace Automation
+    if MarketplaceModule then
+        if flags['autotrading'] and not MarketplaceModule.Config.AutoTrading then
+            MarketplaceModule:StartAutoTrading()
+        elseif not flags['autotrading'] and MarketplaceModule.Config.AutoTrading then
+            MarketplaceModule:StopAutoTrading()
+        end
+        
+        if flags['autoshopping'] and not MarketplaceModule.Config.AutoBuying then
+            MarketplaceModule:StartAutoShopping()
+        elseif not flags['autoshopping'] and MarketplaceModule.Config.AutoBuying then
+            MarketplaceModule:StopAutoShopping()
+        end
+        
+        if flags['pricemonitoring'] and not MarketplaceModule.Config.PriceMonitoring then
+            MarketplaceModule:StartPriceMonitoring()
+        elseif not flags['pricemonitoring'] and MarketplaceModule.Config.PriceMonitoring then
+            MarketplaceModule:StopPriceMonitoring()
+        end
+        
+        -- Update configuration
+        if flags['maxspend'] and tonumber(flags['maxspend']) then
+            MarketplaceModule:SetMaxSpendAmount(tonumber(flags['maxspend']))
+        end
+        
+        if flags['profitmargin'] then
+            MarketplaceModule:SetMinProfitMargin(flags['profitmargin'] / 100)
+        end
+        
+        if flags['autorefresh'] then
+            MarketplaceModule.Config.AutoRefreshShops = true
+        else
+            MarketplaceModule.Config.AutoRefreshShops = false
+        end
+    end
+
     -- Autofarm
     if flags['freezechar'] then
         if flags['freezecharmode'] == 'Toggled' then
@@ -351,6 +437,12 @@ RunService.Heartbeat:Connect(function()
         getchar():SetAttribute('Refill', false)
     end
 end)
+
+--// Initialize Marketplace Module
+if MarketplaceModule then
+    MarketplaceModule:Initialize()
+    message('Marketplace Module Loaded Successfully!', 5)
+end
 
 --// Hooks
 if CheckFunc(hookmetamethod) then
