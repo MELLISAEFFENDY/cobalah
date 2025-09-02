@@ -143,11 +143,37 @@ else
     print("✅ Rayfield UI loaded from local file!")
 end
 
+--// Load Advanced Inventory Exploits from GitHub
+local InventoryExploits
+local inventoryURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/advanced_inventory_exploits.lua"
+
+-- Try to load from GitHub first, fallback to local if needed
+local success2, result2 = pcall(function()
+    return loadstring(game:HttpGet(inventoryURL))()
+end)
+
+if success2 and result2 then
+    InventoryExploits = result2
+    InventoryExploits:Initialize()
+    print("✅ Advanced Inventory Exploits loaded from GitHub successfully!")
+else
+    print("⚠️ Failed to load Inventory Exploits from GitHub, trying local file...")
+    if CheckFunc(loadfile) then
+        InventoryExploits = loadfile('d:/fishchcoba/advanced_inventory_exploits.lua')()
+    else
+        InventoryExploits = loadstring(readfile('d:/fishchcoba/advanced_inventory_exploits.lua'))()
+    end
+    if InventoryExploits then
+        InventoryExploits:Initialize()
+        print("✅ Advanced Inventory Exploits loaded from local file!")
+    end
+end
+
 --// Create UI
 local Window = Rayfield:CreateWindow({
-    Name = "Fisch Cheat Hub v1",
-    LoadingTitle = "Fisch Cheat Loading...",
-    LoadingSubtitle = "by YourName",
+    Name = "Fisch Cheat Hub v2",
+    LoadingTitle = "Fisch Advanced Exploits Loading...",
+    LoadingSubtitle = "by YourName - Now with Inventory System",
 })
 
 --// Create Tabs
@@ -155,6 +181,7 @@ local AutomationTab = Window:CreateTab({Name = "Automation"})
 local ModificationsTab = Window:CreateTab({Name = "Modifications"})
 local TeleportsTab = Window:CreateTab({Name = "Teleports"})
 local VisualsTab = Window:CreateTab({Name = "Visuals"})
+local InventoryTab = Window:CreateTab({Name = "Inventory"})
 
 --// Automation Tab
 AutomationTab:CreateSection({Name = "Autofarm"})
@@ -495,6 +522,214 @@ local FishAbundanceToggle = VisualsTab:CreateToggle({
         -- Callback handled in main loop
     end,
 })
+
+--// Inventory Tab
+if InventoryExploits then
+    InventoryTab:CreateSection({Name = "Item Collection"})
+
+    local AutoCollectorToggle = InventoryTab:CreateToggle({
+        Name = "Auto Item Collector",
+        CurrentValue = false,
+        Flag = "autocollector",
+        Callback = function(Value)
+            if Value then
+                InventoryExploits:StartAutoItemCollector()
+                message("✅ Auto Item Collector Started", 3)
+            else
+                InventoryExploits:StopAutoItemCollector()
+                message("⛔ Auto Item Collector Stopped", 3)
+            end
+        end,
+    })
+
+    local ItemTeleporterToggle = InventoryTab:CreateToggle({
+        Name = "Item Teleporter",
+        CurrentValue = false,
+        Flag = "itemteleporter",
+        Callback = function(Value)
+            if Value then
+                InventoryExploits:StartItemTeleporter()
+                message("✅ Item Teleporter Started", 3)
+            else
+                InventoryExploits:StopItemTeleporter()
+                message("⛔ Item Teleporter Stopped", 3)
+            end
+        end,
+    })
+
+    local CollectDelaySlider = InventoryTab:CreateDropdown({
+        Name = "Collection Delay",
+        Options = {"0.1", "0.5", "1.0", "2.0", "5.0"},
+        CurrentOption = "0.5",
+        Flag = "collectdelay",
+        Callback = function(Option)
+            InventoryExploits:SetCollectDelay(tonumber(Option))
+            message("🕐 Collection delay set to " .. Option .. "s", 2)
+        end,
+    })
+
+    local TeleportRadiusDropdown = InventoryTab:CreateDropdown({
+        Name = "Teleport Radius",
+        Options = {"100", "500", "1000", "2000", "5000"},
+        CurrentOption = "1000",
+        Flag = "teleportradius", 
+        Callback = function(Option)
+            InventoryExploits:SetTeleportRadius(tonumber(Option))
+            message("📡 Teleport radius set to " .. Option .. " studs", 2)
+        end,
+    })
+
+    InventoryTab:CreateSection({Name = "Item Duplication"})
+
+    local InventoryDuplicatorToggle = InventoryTab:CreateToggle({
+        Name = "Inventory Duplicator",
+        CurrentValue = false,
+        Flag = "inventoryduplicator",
+        Callback = function(Value)
+            if Value then
+                InventoryExploits:StartInventoryDuplicator()
+                message("✅ Inventory Duplicator Started", 3)
+            else
+                InventoryExploits:StopInventoryDuplicator()
+                message("⛔ Inventory Duplicator Stopped", 3)
+            end
+        end,
+    })
+
+    local MaxDuplicatesDropdown = InventoryTab:CreateDropdown({
+        Name = "Max Duplicates",
+        Options = {"10", "25", "50", "99", "999"},
+        CurrentOption = "99",
+        Flag = "maxduplicates",
+        Callback = function(Option)
+            InventoryExploits:SetMaxDuplicates(tonumber(Option))
+            message("🔢 Max duplicates set to " .. Option, 2)
+        end,
+    })
+
+    local DuplicateDelayDropdown = InventoryTab:CreateDropdown({
+        Name = "Duplicate Delay",
+        Options = {"0.5", "1.0", "2.0", "3.0", "5.0"},
+        CurrentOption = "1.0",
+        Flag = "duplicatedelay",
+        Callback = function(Option)
+            InventoryExploits:SetDuplicateDelay(tonumber(Option))
+            message("⏱️ Duplicate delay set to " .. Option .. "s", 2)
+        end,
+    })
+
+    InventoryTab:CreateSection({Name = "Equipment & Skins"})
+
+    local AutoEquipperToggle = InventoryTab:CreateToggle({
+        Name = "Auto Equipment Optimizer",
+        CurrentValue = false,
+        Flag = "autoequipper",
+        Callback = function(Value)
+            if Value then
+                InventoryExploits:StartAutoEquipper()
+                message("✅ Auto Equipment Optimizer Started", 3)
+            else
+                InventoryExploits:StopAutoEquipper()
+                message("⛔ Auto Equipment Optimizer Stopped", 3)
+            end
+        end,
+    })
+
+    local SkinUnlockerButton = InventoryTab:CreateButton({
+        Name = "🎨 Unlock All Skins",
+        Callback = function()
+            InventoryExploits:StartSkinUnlocker()
+            message("🎨 Starting skin unlock process...", 3)
+        end,
+    })
+
+    InventoryTab:CreateSection({Name = "Control Center"})
+
+    local StartAllButton = InventoryTab:CreateButton({
+        Name = "🚀 Start All Systems",
+        Callback = function()
+            InventoryExploits:StartAllSystems()
+            message("🚀 All inventory systems started!", 3)
+            
+            -- Update UI toggles
+            Rayfield.Flags["autocollector"] = true
+            Rayfield.Flags["itemteleporter"] = true
+            Rayfield.Flags["inventoryduplicator"] = true
+            Rayfield.Flags["autoequipper"] = true
+        end,
+    })
+
+    local StopAllButton = InventoryTab:CreateButton({
+        Name = "⛔ Stop All Systems",
+        Callback = function()
+            InventoryExploits:StopAllSystems()
+            message("⛔ All inventory systems stopped!", 3)
+            
+            -- Update UI toggles
+            Rayfield.Flags["autocollector"] = false
+            Rayfield.Flags["itemteleporter"] = false
+            Rayfield.Flags["inventoryduplicator"] = false
+            Rayfield.Flags["autoequipper"] = false
+        end,
+    })
+
+    local StatusButton = InventoryTab:CreateButton({
+        Name = "📊 Show Status",
+        Callback = function()
+            local status = InventoryExploits:GetStatus()
+            local msg = "📊 Inventory Status:\n\n"
+            msg = msg .. "🔄 Auto Collector: " .. (status.AutoItemCollector and "ON" or "OFF") .. "\n"
+            msg = msg .. "📦 Duplicator: " .. (status.InventoryDuplicator and "ON" or "OFF") .. "\n"
+            msg = msg .. "🎨 Skin Unlocker: " .. (status.SkinUnlocker and "ON" or "OFF") .. "\n"
+            msg = msg .. "⚡ Auto Equipper: " .. (status.AutoEquipper and "ON" or "OFF") .. "\n"
+            msg = msg .. "📡 Item Teleporter: " .. (status.ItemTeleporter and "ON" or "OFF") .. "\n\n"
+            msg = msg .. "📈 Items Collected: " .. (status.CollectedItems or 0) .. "\n"
+            msg = msg .. "📋 Items Duplicated: " .. (status.DuplicatedItems or 0)
+            message(msg, 10)
+        end,
+    })
+
+    local EmergencyStopButton = InventoryTab:CreateButton({
+        Name = "🚨 EMERGENCY STOP",
+        Callback = function()
+            InventoryExploits:EmergencyStop()
+            message("🚨 EMERGENCY STOP ACTIVATED!", 5)
+            
+            -- Reset all UI toggles
+            Rayfield.Flags["autocollector"] = false
+            Rayfield.Flags["itemteleporter"] = false
+            Rayfield.Flags["inventoryduplicator"] = false
+            Rayfield.Flags["autoequipper"] = false
+        end,
+    })
+
+    InventoryTab:CreateSection({Name = "Advanced Options"})
+
+    local ClearDataButton = InventoryTab:CreateButton({
+        Name = "🗑️ Clear Duplicate Data",
+        Callback = function()
+            InventoryExploits:ClearDuplicatedItems()
+            message("🗑️ Duplicated items data cleared", 3)
+        end,
+    })
+
+    local ResetConfigButton = InventoryTab:CreateButton({
+        Name = "🔄 Reset Configuration",
+        Callback = function()
+            InventoryExploits:ResetConfiguration()
+            message("🔄 Configuration reset to defaults", 3)
+        end,
+    })
+else
+    InventoryTab:CreateSection({Name = "Error"})
+    
+    local ErrorLabel = InventoryTab:CreateButton({
+        Name = "❌ Inventory Module Failed to Load",
+        Callback = function()
+            message("❌ Advanced Inventory Exploits module failed to load from GitHub", 5)
+        end,
+    })
+end
 
 --// Main Loop
 RunService.Heartbeat:Connect(function()
