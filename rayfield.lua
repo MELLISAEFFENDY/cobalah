@@ -182,12 +182,25 @@ function Rayfield:CreateWindow(WindowSettings)
         Parent = Topbar,
         BackgroundTransparency = 1,
         Position = UDim2.new(0, 15, 0, 0),
-        Size = UDim2.new(1, -30, 1, 0),
+        Size = UDim2.new(1, -100, 1, 0), -- Reduced width to make room for buttons
         Font = Rayfield.Theme.TextFont,
         Text = Name,
         TextColor3 = Rayfield.Theme.TextColor,
         TextSize = 18,
         TextXAlignment = Enum.TextXAlignment.Left
+    })
+
+    -- Minimize Button
+    local MinimizeButton = CreateObject("TextButton", {
+        Name = "MinimizeButton",
+        Parent = Topbar,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(1, -90, 0, 0),
+        Size = UDim2.new(0, 45, 1, 0),
+        Font = Rayfield.Theme.TextFont,
+        Text = "−",
+        TextColor3 = Rayfield.Theme.TextColor,
+        TextSize = 18
     })
 
     -- Close Button
@@ -206,6 +219,145 @@ function Rayfield:CreateWindow(WindowSettings)
     CloseButton.MouseButton1Click:Connect(function()
         Rayfield.Main:Destroy()
         Rayfield.Main = nil
+    end)
+
+    -- Create Floating Button (initially hidden)
+    local FloatingButton = CreateObject("TextButton", {
+        Name = "FloatingButton",
+        Parent = Rayfield.Main,
+        BackgroundColor3 = Rayfield.Theme.ElementBackground,
+        BorderSizePixel = 0,
+        Position = UDim2.new(0, 20, 0, 20),
+        Size = UDim2.new(0, 60, 0, 60),
+        Font = Rayfield.Theme.TextFont,
+        Text = "�",
+        TextColor3 = Rayfield.Theme.TextColor,
+        TextSize = 20,
+        Visible = false,
+        ZIndex = 2000 -- Very high ZIndex
+    })
+
+    CreateObject("UICorner", {
+        CornerRadius = UDim.new(0, 30), -- Circular button
+        Parent = FloatingButton
+    })
+
+    CreateObject("UIStroke", {
+        Color = Rayfield.Theme.Border,
+        Thickness = 2,
+        Parent = FloatingButton
+    })
+
+    -- Add shadow effect to floating button
+    local FloatingShadow = CreateObject("Frame", {
+        Name = "Shadow",
+        Parent = FloatingButton,
+        BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+        BackgroundTransparency = 0.7,
+        BorderSizePixel = 0,
+        Position = UDim2.new(0, 3, 0, 3),
+        Size = UDim2.new(1, 0, 1, 0),
+        ZIndex = 1999
+    })
+
+    CreateObject("UICorner", {
+        CornerRadius = UDim.new(0, 30),
+        Parent = FloatingShadow
+    })
+
+    -- Create tooltip for floating button
+    local FloatingTooltip = CreateObject("TextLabel", {
+        Name = "Tooltip",
+        Parent = FloatingButton,
+        BackgroundColor3 = Rayfield.Theme.NotificationBackground,
+        BorderSizePixel = 0,
+        Position = UDim2.new(1, 10, 0, 0),
+        Size = UDim2.new(0, 100, 0, 30),
+        Font = Rayfield.Theme.TextFont,
+        Text = "Click to restore",
+        TextColor3 = Rayfield.Theme.TextColor,
+        TextSize = 12,
+        TextXAlignment = Enum.TextXAlignment.Center,
+        TextYAlignment = Enum.TextYAlignment.Center,
+        Visible = false,
+        ZIndex = 2001
+    })
+
+    CreateObject("UICorner", {
+        CornerRadius = UDim.new(0, 6),
+        Parent = FloatingTooltip
+    })
+
+    CreateObject("UIStroke", {
+        Color = Rayfield.Theme.Border,
+        Thickness = 1,
+        Parent = FloatingTooltip
+    })
+
+    -- Make floating button draggable
+    MakeDraggable(FloatingButton, FloatingButton)
+
+    -- Minimize functionality
+    MinimizeButton.MouseButton1Click:Connect(function()
+        Main.Visible = false
+        FloatingButton.Visible = true
+        
+        -- Smooth fade in animation for floating button
+        FloatingButton.Transparency = 1
+        TweenService:Create(FloatingButton, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Transparency = 0
+        }):Play()
+    end)
+
+    -- Restore from floating button
+    FloatingButton.MouseButton1Click:Connect(function()
+        FloatingButton.Visible = false
+        Main.Visible = true
+    end)
+
+    -- Floating button hover effects
+    FloatingButton.MouseEnter:Connect(function()
+        FloatingTooltip.Visible = true
+        TweenService:Create(FloatingButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 70, 0, 70),
+            BackgroundColor3 = Rayfield.Theme.ElementBackgroundHover
+        }):Play()
+        TweenService:Create(FloatingTooltip, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            BackgroundTransparency = 0
+        }):Play()
+    end)
+
+    FloatingButton.MouseLeave:Connect(function()
+        FloatingTooltip.Visible = false
+        TweenService:Create(FloatingButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 60, 0, 60),
+            BackgroundColor3 = Rayfield.Theme.ElementBackground
+        }):Play()
+    end)
+
+    -- Add pulse animation to floating button
+    local function PulseFloatingButton()
+        if FloatingButton.Visible then
+            local pulseTween = TweenService:Create(FloatingButton, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
+                Size = UDim2.new(0, 65, 0, 65)
+            })
+            pulseTween:Play()
+            
+            -- Stop pulse when button is clicked or hidden
+            local connection
+            connection = FloatingButton:GetPropertyChangedSignal("Visible"):Connect(function()
+                if not FloatingButton.Visible then
+                    pulseTween:Cancel()
+                    connection:Disconnect()
+                end
+            end)
+        end
+    end
+
+    -- Start pulse when minimized
+    local minimizeConnection = MinimizeButton.MouseButton1Click:Connect(function()
+        task.wait(0.5) -- Wait for fade in animation
+        PulseFloatingButton()
     end)
 
     -- Tab Container
@@ -596,15 +748,16 @@ function Rayfield:CreateWindow(WindowSettings)
                 Parent = DropdownFrame
             })
 
+            -- Create dropdown list as child of Main (not TabContent) to prevent clipping
             local DropdownList = CreateObject("Frame", {
                 Name = "DropdownList",
-                Parent = Dropdown,
+                Parent = Rayfield.Main,
                 BackgroundColor3 = Rayfield.Theme.ElementBackground,
                 BorderSizePixel = 0,
-                Position = UDim2.new(0.5, 10, 1, 5),
-                Size = UDim2.new(0.5, -25, 0, 0),
+                Position = UDim2.new(0, 0, 0, 0), -- Will be calculated dynamically
+                Size = UDim2.new(0, 0, 0, 0), -- Will be calculated dynamically
                 Visible = false,
-                ZIndex = 10
+                ZIndex = 1000 -- Very high ZIndex to appear above everything
             })
 
             CreateObject("UICorner", {
@@ -626,7 +779,8 @@ function Rayfield:CreateWindow(WindowSettings)
                 Size = UDim2.new(1, 0, 1, 0),
                 ScrollBarThickness = 3,
                 CanvasSize = UDim2.new(0, 0, 0, 0),
-                ScrollingDirection = Enum.ScrollingDirection.Y
+                ScrollingDirection = Enum.ScrollingDirection.Y,
+                ZIndex = 1001 -- Higher than parent
             })
 
             CreateObject("UIListLayout", {
@@ -639,6 +793,15 @@ function Rayfield:CreateWindow(WindowSettings)
 
             if Flag then
                 Rayfield.Flags[Flag] = CurrentOption
+            end
+
+            -- Function to calculate dropdown list position
+            local function UpdateDropdownPosition()
+                local DropdownFramePosition = DropdownFrame.AbsolutePosition
+                local DropdownFrameSize = DropdownFrame.AbsoluteSize
+                
+                DropdownList.Position = UDim2.new(0, DropdownFramePosition.X, 0, DropdownFramePosition.Y + DropdownFrameSize.Y + 5)
+                DropdownList.Size = UDim2.new(0, DropdownFrameSize.X, 0, math.min(#Options * 25, 100))
             end
 
             local function UpdateDropdownList()
@@ -659,7 +822,8 @@ function Rayfield:CreateWindow(WindowSettings)
                         Text = option,
                         TextColor3 = Rayfield.Theme.TextColor,
                         TextSize = 12,
-                        TextXAlignment = Enum.TextXAlignment.Center
+                        TextXAlignment = Enum.TextXAlignment.Center,
+                        ZIndex = 1002 -- Higher than container
                     })
 
                     OptionButton.MouseButton1Click:Connect(function()
@@ -676,14 +840,27 @@ function Rayfield:CreateWindow(WindowSettings)
                 end
 
                 local ContentSize = DropdownListContainer.UIListLayout.AbsoluteContentSize
-                DropdownList.Size = UDim2.new(0.5, -25, 0, math.min(ContentSize.Y, 100))
                 DropdownListContainer.CanvasSize = UDim2.new(0, 0, 0, ContentSize.Y)
+                
+                -- Update dropdown position and size
+                UpdateDropdownPosition()
             end
 
             UpdateDropdownList()
 
             DropdownFrame.MouseButton1Click:Connect(function()
+                UpdateDropdownPosition() -- Update position before showing
                 DropdownList.Visible = not DropdownList.Visible
+            end)
+
+            -- Hide dropdown when clicking elsewhere
+            UserInputService.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    local hit = input.Target
+                    if hit and not hit:IsDescendantOf(DropdownFrame) and not hit:IsDescendantOf(DropdownList) then
+                        DropdownList.Visible = false
+                    end
+                end
             end)
 
             local DropdownObject = {
