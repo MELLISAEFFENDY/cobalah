@@ -324,6 +324,13 @@ print("✅ All tabs created successfully!")
 --// Create UI Content with Error Handling
 print("🎨 Creating UI Content...")
 
+-- State tracking variables for main loop
+local freezeCharEnabled = false
+local freezeCharMode = "Toggled"
+local autoCastEnabled = false
+local autoShakeEnabled = false
+local autoReelEnabled = false
+
 local contentSuccess, contentError = pcall(function()
 
 --// Automation Tab
@@ -334,7 +341,13 @@ local FreezeCharToggle = AutomationTab:CreateToggle({
     CurrentValue = false,
     Flag = "freezechar",
     Callback = function(Value)
-        -- Callback handled in main loop
+        freezeCharEnabled = Value
+        if Value then
+            message("🧊 Character Freeze: ENABLED", 2)
+        else
+            message("🧊 Character Freeze: DISABLED", 2)
+            characterposition = nil -- Clear saved position
+        end
     end,
 })
 
@@ -344,7 +357,8 @@ local FreezeCharModeDropdown = AutomationTab:CreateDropdown({
     CurrentOption = 'Rod Equipped',
     Flag = "freezecharmode",
     Callback = function(Option)
-        -- Callback handled in main loop
+        freezeCharMode = Option
+        print("🔄 Freeze mode changed to:", Option)
     end,
 })
 
@@ -353,7 +367,12 @@ local AutoCastToggle = AutomationTab:CreateToggle({
     CurrentValue = false,
     Flag = "autocast",
     Callback = function(Value)
-        -- Callback handled in main loop
+        autoCastEnabled = Value
+        if Value then
+            message("🎣 Auto Cast: ENABLED", 2)
+        else
+            message("🎣 Auto Cast: DISABLED", 2)
+        end
     end,
 })
 
@@ -362,7 +381,12 @@ local AutoShakeToggle = AutomationTab:CreateToggle({
     CurrentValue = false,
     Flag = "autoshake",
     Callback = function(Value)
-        -- Callback handled in main loop
+        autoShakeEnabled = Value
+        if Value then
+            message("🎯 Auto Shake: ENABLED", 2)
+        else
+            message("🎯 Auto Shake: DISABLED", 2)
+        end
     end,
 })
 
@@ -371,7 +395,12 @@ local AutoReelToggle = AutomationTab:CreateToggle({
     CurrentValue = false,
     Flag = "autoreel",
     Callback = function(Value)
-        -- Callback handled in main loop
+        autoReelEnabled = Value
+        if Value then
+            message("🎣 Auto Reel: ENABLED", 2)
+        else
+            message("🎣 Auto Reel: DISABLED", 2)
+        end
     end,
 })
 
@@ -430,22 +459,29 @@ local NoPeaksSystemsToggle = ModificationsTab:CreateToggle({
 --// Teleports Tab
 TeleportsTab:CreateSection("Legacy Locations")
 
+-- Add variables for legacy teleport system
+local selectedZone = ZoneNames[1] or ""
+local selectedRod = RodNames[1] or ""
+
 local ZonesDropdown = TeleportsTab:CreateDropdown({
     Name = "Zones",
     Options = ZoneNames,
-    CurrentOption = ZoneNames[1],
+    CurrentOption = selectedZone,
     Flag = "zones",
     Callback = function(Option)
-        -- Callback handled when button clicked
+        selectedZone = Option
+        print("🔄 Zone selected:", Option)
     end,
 })
 
 local TeleportToZoneButton = TeleportsTab:CreateButton({
     Name = "Teleport To Zone",
     Callback = function()
-        local selectedZone = Rayfield.Flags["zones"]
         if selectedZone and TeleportLocations['Zones'][selectedZone] then
             gethrp().CFrame = TeleportLocations['Zones'][selectedZone]
+            message("🌍 Teleported to: " .. selectedZone, 2)
+        else
+            message("❌ Invalid zone selected", 2)
         end
     end,
 })
@@ -453,19 +489,22 @@ local TeleportToZoneButton = TeleportsTab:CreateButton({
 local RodLocationsDropdown = TeleportsTab:CreateDropdown({
     Name = "Rod Locations",
     Options = RodNames,
-    CurrentOption = RodNames[1],
+    CurrentOption = selectedRod,
     Flag = "rodlocations",
     Callback = function(Option)
-        -- Callback handled when button clicked
+        selectedRod = Option
+        print("🔄 Rod location selected:", Option)
     end,
 })
 
 local TeleportToRodButton = TeleportsTab:CreateButton({
     Name = "Teleport To Rod",
     Callback = function()
-        local selectedRod = Rayfield.Flags["rodlocations"]
         if selectedRod and TeleportLocations['Rods'][selectedRod] then
             gethrp().CFrame = TeleportLocations['Rods'][selectedRod]
+            message("🎣 Teleported to: " .. selectedRod, 2)
+        else
+            message("❌ Invalid rod location selected", 2)
         end
     end,
 })
@@ -475,56 +514,64 @@ TeleportsTab:CreateSection("GPS System V2 (276 Locations)")
 -- Get GPS categories and create dropdown
 local GPSCategories = TeleportSystemV2.getCategoryNames()
 local GPSLocationDropdown -- Forward declaration
+local selectedGPSCategory = GPSCategories[1] or "Terrapin Island Area"
+local selectedGPSLocation = ""
 
 local GPSCategoryDropdown = TeleportsTab:CreateDropdown({
     Name = "GPS Categories",
     Options = GPSCategories,
-    CurrentOption = GPSCategories[1],
+    CurrentOption = selectedGPSCategory,
     Flag = "gpscategory",
     Callback = function(Option)
         print("🔄 GPS Category changed to:", Option)
+        selectedGPSCategory = Option
+        
         -- Update location dropdown when category changes
         local locations = TeleportSystemV2.getLocationNames(Option)
         print("📍 Found", #locations, "locations for category:", Option)
         
-        if GPSLocationDropdown then
-            -- Try to refresh the dropdown
+        if GPSLocationDropdown and locations and #locations > 0 then
+            -- Use Rayfield V2 Refresh method
             local success, error = pcall(function()
-                GPSLocationDropdown:Refresh(locations, locations[1] or "No locations")
+                GPSLocationDropdown:Refresh(locations)
             end)
             
-            if not success then
-                print("⚠️ Refresh method failed, trying alternative method")
-                -- Alternative method: Update the flag directly
-                GPSLocationDropdown.Options = locations
-                if #locations > 0 then
-                    Rayfield.Flags["gpslocation"] = locations[1]
-                end
-            end
-            
-            if #locations > 0 then
-                Rayfield.Flags["gpslocation"] = locations[1]
+            if success then
+                selectedGPSLocation = locations[1]
+                print("✅ Dropdown refreshed successfully with", #locations, "locations")
                 message("📂 Category: " .. Option .. " (" .. #locations .. " locations)", 2)
             else
-                message("📂 Category: " .. Option .. " (No locations found)", 2)
+                print("⚠️ Refresh method failed:", error)
+                message("⚠️ Failed to update locations for category: " .. Option, 2)
             end
         else
-            print("❌ GPSLocationDropdown is nil")
+            if not GPSLocationDropdown then
+                print("❌ GPSLocationDropdown is nil")
+            else
+                print("❌ No locations found for category:", Option)
+                message("📂 Category: " .. Option .. " (No locations found)", 2)
+            end
         end
     end,
 })
 
 -- Initial location names
-local initialLocations = TeleportSystemV2.getLocationNames(GPSCategories[1])
+local initialLocations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
+if #initialLocations > 0 then
+    selectedGPSLocation = initialLocations[1]
+end
+
 GPSLocationDropdown = TeleportsTab:CreateDropdown({
     Name = "GPS Locations",
     Options = initialLocations,
     CurrentOption = initialLocations[1] or "No locations",
     Flag = "gpslocation",
     Callback = function(Option)
+        selectedGPSLocation = Option
+        print("📍 GPS Location selected:", Option)
+        
         -- Show distance when location selected
-        local category = Rayfield.Flags["gpscategory"]
-        local locations = TeleportSystemV2.getLocationsByCategory(category)
+        local locations = TeleportSystemV2.getLocationsByCategory(selectedGPSCategory)
         for _, location in pairs(locations) do
             if location.name == Option then
                 local distance = TeleportSystemV2.getDistanceToLocation(location)
@@ -535,30 +582,36 @@ GPSLocationDropdown = TeleportsTab:CreateDropdown({
     end,
 })
 
+-- Add variable for teleport method
+local selectedTeleportMethod = "CFrame"
+
 local TeleportMethodDropdown = TeleportsTab:CreateDropdown({
     Name = "Teleport Method",
     Options = {"CFrame", "TweenService", "RequestTeleportCFrame", "TeleportService"},
-    CurrentOption = "CFrame",
+    CurrentOption = selectedTeleportMethod,
     Flag = "teleportmethod",
     Callback = function(Option)
-        -- Method selection callback
+        selectedTeleportMethod = Option
+        print("🔄 Teleport method changed to:", Option)
     end,
 })
 
 local GPSTeleportButton = TeleportsTab:CreateButton({
     Name = "🌍 GPS Teleport",
     Callback = function()
-        local category = Rayfield.Flags["gpscategory"]
-        local locationName = Rayfield.Flags["gpslocation"] 
-        local method = Rayfield.Flags["teleportmethod"]
+        local category = selectedGPSCategory
+        local locationName = selectedGPSLocation
+        local method = selectedTeleportMethod or "CFrame"
         
-        if category and locationName then
+        if category and locationName and locationName ~= "No locations" then
             local success, msg = TeleportSystemV2.teleportToLocation(locationName, category, method)
             if success then
                 message("✅ " .. msg, 3)
             else
                 message("❌ " .. msg, 3)
             end
+        else
+            message("❌ Please select a valid GPS location first", 3)
         end
     end,
 })
@@ -566,7 +619,7 @@ local GPSTeleportButton = TeleportsTab:CreateButton({
 local NearestLocationsButton = TeleportsTab:CreateButton({
     Name = "📍 Find Nearest (5)",
     Callback = function()
-        local category = Rayfield.Flags["gpscategory"]
+        local category = selectedGPSCategory
         local nearest = TeleportSystemV2.getNearestLocations(category, 5)
         
         local msg = "🔍 Nearest locations in " .. category .. ":\n"
@@ -582,7 +635,7 @@ TeleportsTab:CreateSection("Advanced Features")
 local AutoTreasureButton = TeleportsTab:CreateButton({
     Name = "🏴‍☠️ Auto Treasure Hunt",
     Callback = function()
-        local method = Rayfield.Flags["teleportmethod"]
+        local method = selectedTeleportMethod
         TeleportSystemV2.autoTreasureHunt(3, method)
         message("🏴‍☠️ Auto Treasure Hunt started!", 3)
     end,
@@ -591,8 +644,8 @@ local AutoTreasureButton = TeleportsTab:CreateButton({
 local BatchTeleportButton = TeleportsTab:CreateButton({
     Name = "🚀 Batch Teleport (Category)",
     Callback = function()
-        local category = Rayfield.Flags["gpscategory"]
-        local method = Rayfield.Flags["teleportmethod"]
+        local category = selectedGPSCategory
+        local method = selectedTeleportMethod
         local locations = TeleportSystemV2.getLocationsByCategory(category)
         
         if #locations > 10 then
@@ -889,7 +942,7 @@ if InventoryExploits then
         end,
     })
 else
-    InventoryTab:CreateSection({Name = "Error"})
+    InventoryTab:CreateSection("Error")
     
     local ErrorLabel = InventoryTab:CreateButton({
         Name = "❌ Inventory Module Failed to Load",
@@ -900,8 +953,11 @@ else
 end
 
 --// Economy Tab
+EconomyTab:CreateSection("Economy & Marketplace")
+
 if EconomyExploits then
-    EconomyTab:CreateSection({Name = "Market Operations"})
+    -- Full Economy Features Available
+    EconomyTab:CreateSection("Market Operations")
 
     local MarketPriceManipulatorToggle = EconomyTab:CreateToggle({
         Name = "Market Price Manipulator",
@@ -948,7 +1004,7 @@ if EconomyExploits then
         end,
     })
 
-    EconomyTab:CreateSection({Name = "Trading & Marketplace"})
+    EconomyTab:CreateSection("Trading & Marketplace")
 
     local ItemFlipperToggle = EconomyTab:CreateToggle({
         Name = "Auto Item Flipper",
@@ -980,7 +1036,7 @@ if EconomyExploits then
         end,
     })
 
-    EconomyTab:CreateSection({Name = "Configuration"})
+    EconomyTab:CreateSection("Configuration")
 
     local MaxSpendDropdown = EconomyTab:CreateDropdown({
         Name = "Max Spend Amount",
@@ -1016,7 +1072,7 @@ if EconomyExploits then
         end,
     })
 
-    EconomyTab:CreateSection({Name = "Quick Actions"})
+    EconomyTab:CreateSection("Quick Actions")
 
     local RefreshAllShopsButton = EconomyTab:CreateButton({
         Name = "🔄 Refresh All Shops",
@@ -1050,7 +1106,7 @@ if EconomyExploits then
         end,
     })
 
-    EconomyTab:CreateSection({Name = "Control Center"})
+    EconomyTab:CreateSection("Control Center")
 
     local StartAllEconomyButton = EconomyTab:CreateButton({
         Name = "🚀 Start All Economy Systems",
@@ -1121,12 +1177,47 @@ if EconomyExploits then
         end,
     })
 else
-    EconomyTab:CreateSection("Error")
+    -- Basic Economy Features (Fallback)
+    EconomyTab:CreateSection("Basic Economy Tools")
+    
+    local BasicMarketButton = EconomyTab:CreateButton({
+        Name = "🏪 Open Merchant",
+        Callback = function()
+            -- Basic merchant teleport
+            local success, error = pcall(function()
+                local merchantLocations = {
+                    CFrame.new(-1472.7, 149.4, -3014.5), -- Moosewood Merchant
+                    CFrame.new(475.9, 150.2, 346.8),     -- Mushgrove Merchant
+                    CFrame.new(-1795.8, 137.5, -3302.1)  -- Terrapin Island Merchant
+                }
+                local randomLocation = merchantLocations[math.random(1, #merchantLocations)]
+                gethrp().CFrame = randomLocation
+                message("🏪 Teleported to Merchant!", 3)
+            end)
+            if not success then
+                message("❌ Failed to teleport to merchant", 3)
+            end
+        end,
+    })
+    
+    local BasicShopButton = EconomyTab:CreateButton({
+        Name = "🛒 Find Rod Shop",
+        Callback = function()
+            local success, error = pcall(function()
+                -- Teleport to rod shop in Moosewood
+                gethrp().CFrame = CFrame.new(-1472.7, 149.4, -3014.5)
+                message("🎣 Teleported to Rod Shop!", 3)
+            end)
+            if not success then
+                message("❌ Failed to teleport to shop", 3)
+            end
+        end,
+    })
     
     local EconomyErrorLabel = EconomyTab:CreateButton({
-        Name = "❌ Economy Module Failed to Load",
+        Name = "ℹ️ Advanced Features Unavailable",
         Callback = function()
-            message("❌ Economy & Marketplace Exploits module failed to load from GitHub", 5)
+            message("ℹ️ Advanced Economy & Marketplace features require additional modules.\n\n🔧 Basic economy tools are available above.", 5)
         end,
     })
 end
@@ -1134,14 +1225,14 @@ end
 --// Main Loop
 RunService.Heartbeat:Connect(function()
     -- Autofarm
-    if Rayfield.Flags['freezechar'] then
-        if Rayfield.Flags['freezecharmode'] == 'Toggled' then
+    if freezeCharEnabled then
+        if freezeCharMode == 'Toggled' then
             if characterposition == nil then
                 characterposition = gethrp().CFrame
             else
                 gethrp().CFrame = characterposition
             end
-        elseif Rayfield.Flags['freezecharmode'] == 'Rod Equipped' then
+        elseif freezeCharMode == 'Rod Equipped' then
             local rod = FindRod()
             if rod and characterposition == nil then
                 characterposition = gethrp().CFrame
@@ -1155,7 +1246,7 @@ RunService.Heartbeat:Connect(function()
         characterposition = nil
     end
     
-    if Rayfield.Flags['autoshake'] then
+    if autoShakeEnabled then
         if FindChild(lp.PlayerGui, 'shakeui') and FindChild(lp.PlayerGui['shakeui'], 'safezone') and FindChild(lp.PlayerGui['shakeui']['safezone'], 'button') then
             GuiService.SelectedObject = lp.PlayerGui['shakeui']['safezone']['button']
             if GuiService.SelectedObject == lp.PlayerGui['shakeui']['safezone']['button'] then
@@ -1165,14 +1256,14 @@ RunService.Heartbeat:Connect(function()
         end
     end
     
-    if Rayfield.Flags['autocast'] then
+    if autoCastEnabled then
         local rod = FindRod()
         if rod ~= nil and rod['values']['lure'].Value <= .001 and task.wait(.5) then
             rod.events.cast:FireServer(100, 1)
         end
     end
     
-    if Rayfield.Flags['autoreel'] then
+    if autoReelEnabled then
         local rod = FindRod()
         if rod ~= nil and rod['values']['lure'].Value == 100 and task.wait(.5) then
             ReplicatedStorage.events.reelfinished:FireServer(100, true)
