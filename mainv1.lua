@@ -422,24 +422,49 @@ TeleportsTab:CreateSection({Name = "GPS System V2 (276 Locations)"})
 
 -- Get GPS categories and create dropdown
 local GPSCategories = TeleportSystemV2.getCategoryNames()
+local GPSLocationDropdown -- Forward declaration
+
 local GPSCategoryDropdown = TeleportsTab:CreateDropdown({
     Name = "GPS Categories",
     Options = GPSCategories,
     CurrentOption = GPSCategories[1],
     Flag = "gpscategory",
     Callback = function(Option)
+        print("🔄 GPS Category changed to:", Option)
         -- Update location dropdown when category changes
         local locations = TeleportSystemV2.getLocationNames(Option)
-        GPSLocationDropdown:Refresh(locations)
-        if #locations > 0 then
-            Rayfield.Flags["gpslocation"] = locations[1]
+        print("📍 Found", #locations, "locations for category:", Option)
+        
+        if GPSLocationDropdown then
+            -- Try to refresh the dropdown
+            local success, error = pcall(function()
+                GPSLocationDropdown:Refresh(locations, locations[1] or "No locations")
+            end)
+            
+            if not success then
+                print("⚠️ Refresh method failed, trying alternative method")
+                -- Alternative method: Update the flag directly
+                GPSLocationDropdown.Options = locations
+                if #locations > 0 then
+                    Rayfield.Flags["gpslocation"] = locations[1]
+                end
+            end
+            
+            if #locations > 0 then
+                Rayfield.Flags["gpslocation"] = locations[1]
+                message("📂 Category: " .. Option .. " (" .. #locations .. " locations)", 2)
+            else
+                message("📂 Category: " .. Option .. " (No locations found)", 2)
+            end
+        else
+            print("❌ GPSLocationDropdown is nil")
         end
     end,
 })
 
 -- Initial location names
 local initialLocations = TeleportSystemV2.getLocationNames(GPSCategories[1])
-local GPSLocationDropdown = TeleportsTab:CreateDropdown({
+GPSLocationDropdown = TeleportsTab:CreateDropdown({
     Name = "GPS Locations",
     Options = initialLocations,
     CurrentOption = initialLocations[1] or "No locations",
