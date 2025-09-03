@@ -158,45 +158,33 @@ message = function(text, time)
     end)
 end
 
---// Load Local Rayfield UI V2 (Full Source)
-print("🎨 Loading Local Rayfield UI V2 (Full Source)...")
+--// Load Rayfield UI V2 from GitHub (Full Source)
+print("🎨 Loading Rayfield UI V2 from GitHub...")
 local Rayfield
 
--- Load from local file rayfieldv2.lua (full source from sirius.menu/rayfield)
+-- Load from GitHub rayfieldv2.lua (full source from sirius.menu/rayfield)
 local success, result = pcall(function()
-    print("📁 Loading from local rayfieldv2.lua file (full source)...")
-    return loadstring(readfile("rayfieldv2.lua"))()
+    print("� Loading from GitHub rayfieldv2.lua file...")
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/rayfieldv2.lua"))()
 end)
 
 if success and result then
     Rayfield = result
-    print("✅ Local Rayfield UI V2 (Full Source) loaded successfully!")
+    print("✅ Rayfield UI V2 loaded from GitHub successfully!")
 else
-    print("❌ Failed to load local Rayfield V2. Error:", result)
-    print("📦 Trying fallback to simple rayfield.lua...")
+    print("❌ Failed to load Rayfield V2 from GitHub. Error:", result)
+    print("📦 Trying fallback to original Rayfield source...")
     
-    -- First fallback to simple rayfield.lua
+    -- Fallback to original Rayfield source
     local success2, result2 = pcall(function()
-        return loadstring(readfile("rayfield.lua"))()
+        return loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
     end)
     
     if success2 and result2 then
         Rayfield = result2
-        print("✅ Rayfield UI loaded from simple rayfield.lua fallback!")
+        print("✅ Rayfield UI loaded from original source fallback!")
     else
-        print("📦 Trying final fallback from GitHub...")
-        
-        -- Final fallback to GitHub
-        local success3, result3 = pcall(function()
-            return loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
-        end)
-        
-        if success3 and result3 then
-            Rayfield = result3
-            print("✅ Rayfield UI loaded from GitHub fallback!")
-        else
-            error("❌ Cannot load Rayfield UI from any source!")
-        end
+        error("❌ Cannot load Rayfield UI from any source!")
     end
 end
 
