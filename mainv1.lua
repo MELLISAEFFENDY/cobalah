@@ -50,11 +50,15 @@ if success and result then
     TeleportSystemV2 = result
     print("✅ Teleport System V2 loaded from GitHub successfully!")
 else
-    error("❌ Failed to load Teleport System V2 from GitHub. Error: " .. tostring(result))
+    print("❌ Failed to load Teleport System V2 from GitHub. Error: " .. tostring(result))
+    print("⚠️ Continuing without Advanced Teleport features...")
+    TeleportSystemV2 = nil
 end
 
--- Initialize the teleport system
-TeleportSystemV2 = TeleportSystemV2.init()
+-- Initialize the teleport system only if loaded successfully
+if TeleportSystemV2 then
+    TeleportSystemV2 = TeleportSystemV2.init()
+end
 
 -- Legacy teleport locations for backward compatibility
 local TeleportLocations = {
@@ -139,7 +143,8 @@ if success and result then
     print("✅ Rayfield UI loaded from GitHub successfully!")
 else
     print("❌ Failed to load Rayfield UI from GitHub. Error: " .. tostring(result))
-    error("❌ Failed to load Rayfield UI from GitHub. Error: " .. tostring(result))
+    print("❌ CRITICAL ERROR: Cannot continue without Rayfield UI!")
+    return -- Exit script if Rayfield cannot load
 end
 
 --// Load Advanced Inventory Exploits from GitHub
@@ -169,7 +174,9 @@ if success2 and result2 then
         InventoryExploits = nil
     end
 else
-    error("❌ Failed to load Advanced Inventory Exploits from GitHub. Error: " .. tostring(result2))
+    print("❌ Failed to load Advanced Inventory Exploits from GitHub. Error: " .. tostring(result2))
+    print("⚠️ Continuing without Advanced Inventory features...")
+    InventoryExploits = nil
 end
 
 --// Load Economy & Marketplace Exploits from GitHub
