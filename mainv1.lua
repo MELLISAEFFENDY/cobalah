@@ -1,12 +1,12 @@
---// Services
+﻿--// Services
 local Players = cloneref(game:GetService('Players'))
 local ReplicatedStorage = cloneref(game:GetService('ReplicatedStorage'))
 local RunService = cloneref(game:GetService('RunService'))
 local GuiService = cloneref(game:GetService('GuiService'))
 
-print("🔥 Fisch Cheat Hub v2 - Starting Load Process...")
-print("📍 Script Location: GitHub Raw URL")
-print("⏰ Loading Time: " .. os.date("%H:%M:%S"))
+print("ðŸ”¥ Fisch Cheat Hub v2 - Starting Load Process...")
+print("ðŸ“ Script Location: GitHub Raw URL")
+print("â° Loading Time: " .. os.date("%H:%M:%S"))
 
 --// Variables
 local lp = Players.LocalPlayer
@@ -15,7 +15,7 @@ local deathcon
 local tooltipmessage
 local characterposition
 
-print("✅ Variables initialized successfully!")
+print("âœ… Variables initialized successfully!")
 
 --// Functions (moved up to fix scope issues)
 FindChildOfClass = function(parent, classname)
@@ -34,7 +34,7 @@ CheckFunc = function(func)
     return typeof(func) == 'function'
 end
 
-print("🔧 Helper functions loaded successfully!")
+print("ðŸ”§ Helper functions loaded successfully!")
 
 --// Error Suppression for UI Library
 local originalError = error
@@ -63,15 +63,15 @@ error = function(message, ...)
         string.find(message, "Refresh")
     ) then
         -- Convert error to warning for these specific cases
-        return originalWarn("⚠️ UI Warning: " .. message, ...)
+        return originalWarn("âš ï¸ UI Warning: " .. message, ...)
     end
     return originalError(message, ...)
 end
 
-print("🔇 Error suppression for UI library activated!")
+print("ðŸ”‡ Error suppression for UI library activated!")
 
 --// Load Teleport System V2 from GitHub
-print("📡 Loading Teleport System V2 from GitHub...")
+print("ðŸ“¡ Loading Teleport System V2 from GitHub...")
 local TeleportSystemV2
 local teleportURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/teleport-v2.lua"
 
@@ -82,10 +82,10 @@ end)
 
 if success and result then
     TeleportSystemV2 = result
-    print("✅ Teleport System V2 loaded from GitHub successfully!")
+    print("âœ… Teleport System V2 loaded from GitHub successfully!")
 else
-    print("❌ Failed to load Teleport System V2 from GitHub. Error: " .. tostring(result))
-    print("⚠️ Continuing without Advanced Teleport features...")
+    print("âŒ Failed to load Teleport System V2 from GitHub. Error: " .. tostring(result))
+    print("âš ï¸ Continuing without Advanced Teleport features...")
     TeleportSystemV2 = nil
 end
 
@@ -133,32 +133,32 @@ message = function(text, time)
             end)
         else
             -- Fallback: print to console if GeneralUIModule not available
-            print("💬 Message:", text)
+            print("ðŸ’¬ Message:", text)
         end
     end)
     
     if not success then
         -- Fallback if anything fails
-        print("💬 Message:", text)
+        print("ðŸ’¬ Message:", text)
     end
 end
 
 --// Load Rayfield UI V2 from GitHub (Full Source)
-print("🎨 Loading Rayfield UI V2 from GitHub...")
+print("ðŸŽ¨ Loading Rayfield UI V2 from GitHub...")
 local Rayfield
 
 -- Load from GitHub rayfieldv2.lua (full source from sirius.menu/rayfield)
 local success, result = pcall(function()
-    print("� Loading from GitHub rayfieldv2.lua file...")
+    print("ï¿½ Loading from GitHub rayfieldv2.lua file...")
     return loadstring(game:HttpGet("https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/rayfieldv2.lua"))()
 end)
 
 if success and result then
     Rayfield = result
-    print("✅ Rayfield UI V2 loaded from GitHub successfully!")
+    print("âœ… Rayfield UI V2 loaded from GitHub successfully!")
 else
-    print("❌ Failed to load Rayfield V2 from GitHub. Error:", result)
-    print("📦 Trying fallback to original Rayfield source...")
+    print("âŒ Failed to load Rayfield V2 from GitHub. Error:", result)
+    print("ðŸ“¦ Trying fallback to original Rayfield source...")
     
     -- Fallback to original Rayfield source
     local success2, result2 = pcall(function()
@@ -167,97 +167,97 @@ else
     
     if success2 and result2 then
         Rayfield = result2
-        print("✅ Rayfield UI loaded from original source fallback!")
+        print("âœ… Rayfield UI loaded from original source fallback!")
     else
-        error("❌ Cannot load Rayfield UI from any source!")
+        error("âŒ Cannot load Rayfield UI from any source!")
     end
 end
 
 --// Load Advanced Inventory Exploits from GitHub
-print("📦 Loading Advanced Inventory Exploits from GitHub...")
+print("ðŸ“¦ Loading Advanced Inventory Exploits from GitHub...")
 local InventoryExploits
 local inventoryURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/advanced_inventory_exploits_simple.lua"
 
 -- Load from GitHub only
 local success2, result2 = pcall(function()
     local code = game:HttpGet(inventoryURL)
-    print("📄 Inventory code length:", #code, "characters")
+    print("ðŸ“„ Inventory code length:", #code, "characters")
     return loadstring(code)()
 end)
 
 if success2 and result2 then
     InventoryExploits = result2
-    print("📦 Inventory module type:", typeof(InventoryExploits))
+    print("ðŸ“¦ Inventory module type:", typeof(InventoryExploits))
     if InventoryExploits and typeof(InventoryExploits) == "table" then
         if InventoryExploits.Initialize then
             local initSuccess, initError = pcall(function()
                 InventoryExploits:Initialize()
             end)
             if initSuccess then
-                print("✅ Advanced Inventory Exploits loaded from GitHub successfully!")
+                print("âœ… Advanced Inventory Exploits loaded from GitHub successfully!")
             else
-                print("⚠️ Inventory Exploits loaded but failed to initialize:", initError)
-                print("⚠️ Will continue with limited inventory features...")
+                print("âš ï¸ Inventory Exploits loaded but failed to initialize:", initError)
+                print("âš ï¸ Will continue with limited inventory features...")
                 -- Don't set to nil, keep the module but with limited functionality
             end
         else
-            print("⚠️ Inventory module loaded but missing Initialize function")
+            print("âš ï¸ Inventory module loaded but missing Initialize function")
         end
     else
-        print("⚠️ Inventory Exploits loaded but is not a valid module")
-        print("⚠️ Module type:", typeof(InventoryExploits))
+        print("âš ï¸ Inventory Exploits loaded but is not a valid module")
+        print("âš ï¸ Module type:", typeof(InventoryExploits))
         InventoryExploits = nil
     end
 else
-    print("❌ Failed to load Advanced Inventory Exploits from GitHub. Error: " .. tostring(result2))
-    print("⚠️ Continuing without Advanced Inventory features...")
+    print("âŒ Failed to load Advanced Inventory Exploits from GitHub. Error: " .. tostring(result2))
+    print("âš ï¸ Continuing without Advanced Inventory features...")
     InventoryExploits = nil
 end
 
 --// Load Economy & Marketplace Exploits from GitHub
-print("💰 Loading Economy & Marketplace Exploits from GitHub...")
+print("ðŸ’° Loading Economy & Marketplace Exploits from GitHub...")
 local EconomyExploits
 local economyURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/economy_marketplace_exploits_simple.lua"
 
 -- Try to load from GitHub first, fallback gracefully
 local success3, result3 = pcall(function()
     local code = game:HttpGet(economyURL)
-    print("📄 Economy code length:", #code, "characters")
+    print("ðŸ“„ Economy code length:", #code, "characters")
     return loadstring(code)()
 end)
 
 if success3 and result3 then
     EconomyExploits = result3
-    print("💰 Economy module type:", typeof(EconomyExploits))
+    print("ðŸ’° Economy module type:", typeof(EconomyExploits))
     if EconomyExploits and typeof(EconomyExploits) == "table" then
         if EconomyExploits.Initialize then
             local initSuccess, initError = pcall(function()
                 EconomyExploits:Initialize()
             end)
             if initSuccess then
-                print("✅ Economy & Marketplace Exploits loaded from GitHub successfully!")
+                print("âœ… Economy & Marketplace Exploits loaded from GitHub successfully!")
             else
-                print("⚠️ Economy Exploits loaded but failed to initialize:", initError)
-                print("⚠️ Will continue with limited economy features...")
+                print("âš ï¸ Economy Exploits loaded but failed to initialize:", initError)
+                print("âš ï¸ Will continue with limited economy features...")
                 -- Don't set to nil, keep the module but with limited functionality
             end
         else
-            print("⚠️ Economy module loaded but missing Initialize function")
+            print("âš ï¸ Economy module loaded but missing Initialize function")
         end
     else
-        print("⚠️ Economy Exploits loaded but is not a valid module")
-        print("⚠️ Module type:", typeof(EconomyExploits))
+        print("âš ï¸ Economy Exploits loaded but is not a valid module")
+        print("âš ï¸ Module type:", typeof(EconomyExploits))
         EconomyExploits = nil
     end
 else
-    print("⚠️ Failed to load Economy Exploits from GitHub")
-    print("⚠️ Error:", result3 or "Unknown error")
+    print("âš ï¸ Failed to load Economy Exploits from GitHub")
+    print("âš ï¸ Error:", result3 or "Unknown error")
     -- Set EconomyExploits to nil so we can handle it gracefully in UI
     EconomyExploits = nil
 end
 
 --// Create UI
-print("🚀 Creating Rayfield UI Window...")
+print("ðŸš€ Creating Rayfield UI Window...")
 local windowSuccess, Window = pcall(function()
     return Rayfield:CreateWindow({
         Name = "Fisch Cheat Hub v2",
@@ -278,14 +278,14 @@ local windowSuccess, Window = pcall(function()
 end)
 
 if windowSuccess and Window then
-    print("✅ UI Window created successfully!")
+    print("âœ… UI Window created successfully!")
 else
-    print("❌ Failed to create UI Window:", tostring(Window))
+    print("âŒ Failed to create UI Window:", tostring(Window))
     return
 end
 
 --// Create Tabs
-print("📂 Creating UI Tabs...")
+print("ðŸ“‚ Creating UI Tabs...")
 local AutomationTab, ModificationsTab, TeleportsTab, VisualsTab, InventoryTab, EconomyTab
 
 local tabSuccess, tabError = pcall(function()
@@ -298,16 +298,16 @@ local tabSuccess, tabError = pcall(function()
 end)
 
 if tabSuccess then
-    print("✅ UI Tabs created successfully!")
+    print("âœ… UI Tabs created successfully!")
 else
-    print("❌ Failed to create UI Tabs:", tostring(tabError))
+    print("âŒ Failed to create UI Tabs:", tostring(tabError))
     return
 end
 
-print("✅ All tabs created successfully!")
+print("âœ… All tabs created successfully!")
 
 --// Create UI Content with Error Handling
-print("🎨 Creating UI Content...")
+print("ðŸŽ¨ Creating UI Content...")
 
 -- State tracking variables for main loop
 local freezeCharEnabled = false
@@ -328,9 +328,9 @@ local FreezeCharToggle = AutomationTab:CreateToggle({
     Callback = function(Value)
         freezeCharEnabled = Value
         if Value then
-            message("🧊 Character Freeze: ENABLED", 2)
+            message("ðŸ§Š Character Freeze: ENABLED", 2)
         else
-            message("🧊 Character Freeze: DISABLED", 2)
+            message("ðŸ§Š Character Freeze: DISABLED", 2)
             characterposition = nil -- Clear saved position
         end
     end,
@@ -342,8 +342,9 @@ local FreezeCharModeDropdown = AutomationTab:CreateDropdown({
     CurrentOption = 'Rod Equipped',
     Flag = "freezecharmode",
     Callback = function(Option)
-        freezeCharMode = Option
-        print("🔄 Freeze mode changed to:", Option)
+        local optionStr = tostring(Option or "Rod Equipped")
+        freezeCharMode = optionStr
+        print("ðŸ”„ Freeze mode changed to:", optionStr)
     end,
 })
 
@@ -354,9 +355,9 @@ local AutoCastToggle = AutomationTab:CreateToggle({
     Callback = function(Value)
         autoCastEnabled = Value
         if Value then
-            message("🎣 Auto Cast: ENABLED", 2)
+            message("ðŸŽ£ Auto Cast: ENABLED", 2)
         else
-            message("🎣 Auto Cast: DISABLED", 2)
+            message("ðŸŽ£ Auto Cast: DISABLED", 2)
         end
     end,
 })
@@ -368,9 +369,9 @@ local AutoShakeToggle = AutomationTab:CreateToggle({
     Callback = function(Value)
         autoShakeEnabled = Value
         if Value then
-            message("🎯 Auto Shake: ENABLED", 2)
+            message("ðŸŽ¯ Auto Shake: ENABLED", 2)
         else
-            message("🎯 Auto Shake: DISABLED", 2)
+            message("ðŸŽ¯ Auto Shake: DISABLED", 2)
         end
     end,
 })
@@ -382,9 +383,9 @@ local AutoReelToggle = AutomationTab:CreateToggle({
     Callback = function(Value)
         autoReelEnabled = Value
         if Value then
-            message("🎣 Auto Reel: ENABLED", 2)
+            message("ðŸŽ£ Auto Reel: ENABLED", 2)
         else
-            message("🎣 Auto Reel: DISABLED", 2)
+            message("ðŸŽ£ Auto Reel: DISABLED", 2)
         end
     end,
 })
@@ -442,532 +443,197 @@ local NoPeaksSystemsToggle = ModificationsTab:CreateToggle({
 })
 
 --// Teleports Tab
-TeleportsTab:CreateSection("GPS System V2 (276 Locations)")
+-- GPS SYSTEM V2 WITH SEPARATE DROPDOWNS FOR EACH CATEGORY
+-- This solves the problem of GPS locations not updating correctly
+
+--// Teleports Tab
+TeleportsTab:CreateSection("GPS System V2 - All Categories")
 
 -- Check if TeleportSystemV2 is available before creating GPS components
 if TeleportSystemV2 and TeleportSystemV2.getCategoryNames then
-    -- Get GPS categories and create dropdown
     local GPSCategories = TeleportSystemV2.getCategoryNames()
-    local GPSLocationDropdown -- Forward declaration
-    local selectedGPSCategory = GPSCategories[1] or "Terrapin Island Area"
     local selectedGPSLocation = ""
-
-local GPSCategoryDropdown = TeleportsTab:CreateDropdown({
-    Name = "GPS Categories",
-    Options = GPSCategories,
-    CurrentOption = selectedGPSCategory,
-    Flag = "gpscategory",
-    Callback = function(Option)
-        print("🔄 GPS Category changed to:", Option)
-        selectedGPSCategory = Option
-        
-        -- Update GPS locations for selected category
-        if TeleportSystemV2 then
-            local locations = {}
-            
-            -- Try different methods to get locations for the selected category
-            if TeleportSystemV2.getLocationNames then
-                locations = TeleportSystemV2.getLocationNames(Option)
-                print("📍 getLocationNames for '" .. Option .. "' returned:", #locations, "locations")
-            elseif TeleportSystemV2.getLocationsByCategory then
-                local locationData = TeleportSystemV2.getLocationsByCategory(Option)
-                print("📍 getLocationsByCategory for '" .. Option .. "' returned:", #locationData, "location objects")
-                
-                -- Extract location names from location objects
-                for _, loc in pairs(locationData) do
-                    if loc.name then
-                        table.insert(locations, loc.name)
-                    end
-                end
-                print("📍 Extracted", #locations, "location names")
-            end
-            
-            -- Print first few locations for debugging
-            if #locations > 0 then
-                print("📍 First 3 locations for '" .. Option .. "':")
-                for i = 1, math.min(3, #locations) do
-                    print("   " .. i .. ". " .. locations[i])
-                end
-                selectedGPSLocation = locations[1]
-            else
-                print("❌ No locations found for category '" .. Option .. "'")
-                selectedGPSLocation = ""
-            end
-            
-            -- FORCE update GPS Location dropdown with multiple aggressive methods
-            if GPSLocationDropdown then
-                -- Immediate update without delay
-                local updateSuccess = false
-                
-                -- Method 1: Direct Refresh
-                local success1, err1 = pcall(function()
-                    if GPSLocationDropdown.Refresh then
-                        GPSLocationDropdown:Refresh(locations)
-                        print("✅ Method 1: Direct Refresh successful")
-                        updateSuccess = true
-                    end
-                end)
-                
-                -- Method 2: Options assignment
-                if not updateSuccess then
-                    local success2, err2 = pcall(function()
-                        GPSLocationDropdown.Options = locations
-                        print("✅ Method 2: Options assignment successful")
-                        updateSuccess = true
-                    end)
-                end
-                
-                -- Method 3: Force refresh with delay
-                if not updateSuccess then
-                    task.spawn(function()
-                        task.wait(0.2)
-                        local success3, err3 = pcall(function()
-                            if GPSLocationDropdown.Refresh then
-                                GPSLocationDropdown:Refresh(locations)
-                            else
-                                GPSLocationDropdown.Options = locations
-                            end
-                            print("✅ Method 3: Delayed refresh successful")
-                        end)
-                        if not success3 then
-                            print("❌ Method 3 failed:", err3)
-                        end
-                    end)
-                end
-                
-                -- Method 4: Try to manually trigger update
-                task.spawn(function()
-                    task.wait(0.3)
-                    if GPSLocationDropdown.UpdateDropdown then
-                        GPSLocationDropdown:UpdateDropdown(locations)
-                        print("✅ Method 4: UpdateDropdown successful")
-                    end
-                end)
-                
-                if updateSuccess then
-                    print("✅ GPS Location dropdown updated successfully")
-                else
-                    print("⚠️ Dropdown update may need manual refresh")
-                end
-            else
-                print("❌ GPSLocationDropdown is nil")
-            end
-            
-            if #locations > 0 then
-                message("📂 " .. Option .. " (" .. #locations .. " locations)", 2)
-            else
-                message("❌ No locations for: " .. Option, 3)
-            end
-        else
-            message("❌ Teleport system not loaded", 3)
-        end
-    end,
-})
-
--- Initial location names
-local initialLocations = {}
-if TeleportSystemV2 then
-    print("🔍 Getting initial locations for category:", selectedGPSCategory)
+    local selectedGPSCategory = ""
     
-    -- Try different methods to get initial locations
-    if TeleportSystemV2.getLocationNames then
-        initialLocations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
-        print("📍 getLocationNames returned:", #initialLocations, "initial locations")
-    elseif TeleportSystemV2.getLocationsByCategory then
-        local locationData = TeleportSystemV2.getLocationsByCategory(selectedGPSCategory)
-        print("📍 getLocationsByCategory returned:", #locationData, "initial location objects")
+    print("ðŸ—ºï¸ Creating GPS system with", #GPSCategories, "categories")
+    
+    -- Variables to track selections
+    local categoryDropdowns = {}
+    local selectedTeleportMethod = "CFrame"
+    
+    -- Create teleport method dropdown first
+    local TeleportMethodDropdown = TeleportsTab:CreateDropdown({
+        Name = "Teleport Method",
+        Options = {"CFrame", "TweenService", "RequestTeleportCFrame", "TeleportService"},
+        CurrentOption = selectedTeleportMethod,
+        Flag = "teleportmethod",
+        Callback = function(Option)
+            local optionStr = tostring(Option or "CFrame")
+            selectedTeleportMethod = optionStr
+            print("ðŸ”„ Teleport method changed to:", optionStr)
+        end,
+    })
+    
+    -- Create separate dropdown for each category
+    for categoryIndex, categoryName in pairs(GPSCategories) do
+        local categoryStr = tostring(categoryName)
+        local locations = {}
         
-        for _, loc in pairs(locationData) do
-            if loc.name then
-                table.insert(initialLocations, loc.name)
+        -- Get locations for this category safely
+        local success, err = pcall(function()
+            if TeleportSystemV2.getLocationNames and type(TeleportSystemV2.getLocationNames) == "function" then
+                local locs = TeleportSystemV2.getLocationNames(categoryStr)
+                if type(locs) == "table" and #locs > 0 then
+                    locations = locs
+                    print("ðŸ“ Category '" .. categoryStr .. "' loaded", #locs, "locations via getLocationNames")
+                end
             end
-        end
-        print("📍 Extracted", #initialLocations, "initial location names")
-    end
-end
-
-if #initialLocations > 0 then
-    selectedGPSLocation = initialLocations[1]
-    print("📍 Set initial GPS location to:", selectedGPSLocation)
-else
-    initialLocations = {"No locations available"}
-    print("⚠️ No initial locations found, using placeholder")
-end
-
-GPSLocationDropdown = TeleportsTab:CreateDropdown({
-    Name = "GPS Locations",
-    Options = initialLocations,
-    CurrentOption = initialLocations[1] or "No locations",
-    Flag = "gpslocation",
-    Callback = function(Option)
-        selectedGPSLocation = Option
-        print("📍 GPS Location selected:", Option)
-        message("📍 Location: " .. Option, 2)
-    end,
-})
-
--- Add manual refresh button for GPS locations
-local RefreshGPSButton = TeleportsTab:CreateButton({
-    Name = "🔄 Refresh GPS Locations",
-    Callback = function()
-        if TeleportSystemV2 and selectedGPSCategory then
-            print("🔄 FORCE REFRESH for category:", selectedGPSCategory)
             
-            local locations = {}
-            
-            -- Get locations for CURRENT selected category
-            if TeleportSystemV2.getLocationNames then
-                locations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
-                print("📍 FORCE: getLocationNames for '" .. selectedGPSCategory .. "' returned:", #locations, "locations")
-            elseif TeleportSystemV2.getLocationsByCategory then
-                local locationData = TeleportSystemV2.getLocationsByCategory(selectedGPSCategory)
-                print("📍 FORCE: getLocationsByCategory for '" .. selectedGPSCategory .. "' returned:", #locationData, "location objects")
-                
-                for _, loc in pairs(locationData) do
-                    if loc.name then
-                        table.insert(locations, loc.name)
+            -- Fallback to getLocationsByCategory if first method fails
+            if #locations == 0 and TeleportSystemV2.getLocationsByCategory and type(TeleportSystemV2.getLocationsByCategory) == "function" then
+                local locationData = TeleportSystemV2.getLocationsByCategory(categoryStr)
+                if type(locationData) == "table" then
+                    for _, loc in pairs(locationData) do
+                        if type(loc) == "table" and loc.name then
+                            table.insert(locations, tostring(loc.name))
+                        end
                     end
+                    print("ðŸ“ Category '" .. categoryStr .. "' loaded", #locations, "locations via getLocationsByCategory")
                 end
-                print("📍 FORCE: Extracted", #locations, "location names")
             end
-            
-            if #locations > 0 then
-                -- Print locations for verification
-                print("📍 FORCE: Locations for '" .. selectedGPSCategory .. "':")
-                for i = 1, math.min(5, #locations) do
-                    print("   " .. i .. ". " .. locations[i])
+        end)
+        
+        if not success then
+            print("âŒ Error loading locations for", categoryStr, ":", tostring(err))
+            locations = {"Error loading locations"}
+        elseif #locations == 0 then
+            locations = {"No locations available"}
+        end
+        
+        -- Create section header for category
+        local sectionName = categoryStr .. " (" .. (#locations > 0 and #locations or 0) .. " locations)"
+        TeleportsTab:CreateSection(sectionName)
+        
+        -- Create dropdown for this category
+        local dropdown = TeleportsTab:CreateDropdown({
+            Name = "ðŸ“ " .. categoryStr,
+            Options = locations,
+            CurrentOption = locations[1] or "No locations",
+            Flag = "gps_cat_" .. categoryIndex,
+            Callback = function(Option)
+                local success2, err2 = pcall(function()
+                    local optionStr = tostring(Option or "Unknown")
+                    selectedGPSLocation = optionStr
+                    selectedGPSCategory = categoryStr
+                    print("âœ… Selected:", optionStr, "from", categoryStr)
+                    message("ðŸ“ " .. categoryStr .. ": " .. optionStr, 2)
+                end)
+                
+                if not success2 then
+                    print("âŒ Callback error for", categoryStr, ":", tostring(err2))
                 end
-                
-                selectedGPSLocation = locations[1]
-                
-                -- AGGRESSIVE dropdown update
-                if GPSLocationDropdown then
-                    -- Multiple simultaneous update attempts
-                    for attempt = 1, 3 do
-                        task.spawn(function()
-                            task.wait(attempt * 0.1)
-                            local success, err = pcall(function()
-                                if GPSLocationDropdown.Refresh then
-                                    GPSLocationDropdown:Refresh(locations)
-                                    print("✅ FORCE Attempt " .. attempt .. ": Refresh method")
-                                else
-                                    GPSLocationDropdown.Options = locations
-                                    print("✅ FORCE Attempt " .. attempt .. ": Options assignment")
-                                end
-                            end)
-                            if not success then
-                                print("❌ FORCE Attempt " .. attempt .. " failed:", err)
-                            end
+            end,
+        })
+        
+        -- Store dropdown reference
+        categoryDropdowns[categoryStr] = dropdown
+        
+        -- Create teleport button for this category
+        local teleportButton = TeleportsTab:CreateButton({
+            Name = "ðŸš€ Teleport to " .. categoryStr,
+            Callback = function()
+                if selectedGPSLocation and selectedGPSLocation ~= "" and selectedGPSCategory == categoryStr then
+                    if TeleportSystemV2.teleportToLocation then
+                        local success3, msg = pcall(function()
+                            return TeleportSystemV2.teleportToLocation(selectedGPSLocation, selectedGPSCategory, selectedTeleportMethod)
                         end)
+                        
+                        if success3 and msg then
+                            message("âœ… Teleported to " .. selectedGPSLocation, 3)
+                        else
+                            message("âŒ Teleport failed: " .. tostring(msg), 3)
+                        end
+                    else
+                        message("âŒ Teleport function not available", 3)
                     end
-                    
-                    message("🔄 FORCE SYNC: " .. selectedGPSCategory .. " (" .. #locations .. " locations)", 3)
                 else
-                    message("❌ GPS Location dropdown not found", 3)
-                    print("❌ GPSLocationDropdown is nil")
+                    message("âŒ Please select a location from " .. categoryStr .. " first", 3)
                 end
-            else
-                message("❌ No locations found for: " .. selectedGPSCategory, 3)
-                print("❌ FORCE: No locations found for category:", selectedGPSCategory)
-            end
-        else
-            message("❌ Cannot refresh GPS - system not loaded", 3)
-            print("❌ TeleportSystemV2 or selectedGPSCategory is nil")
-            print("   TeleportSystemV2:", TeleportSystemV2 ~= nil)
-            print("   selectedGPSCategory:", selectedGPSCategory or "nil")
-        end
-    end,
-})
-
--- Add force sync button
-local ForceSyncButton = TeleportsTab:CreateButton({
-    Name = "⚡ Force Sync GPS",
-    Callback = function()
-        if TeleportSystemV2 and selectedGPSCategory then
-            print("⚡ FORCE SYNC INITIATED for:", selectedGPSCategory)
-            
-            -- Get all available categories to verify current selection
-            local allCategories = TeleportSystemV2.getCategoryNames()
-            print("📂 Available categories:", table.concat(allCategories, ", "))
-            print("📂 Currently selected:", selectedGPSCategory)
-            
-            -- Get locations using both methods and compare
-            local locations1 = {}
-            local locations2 = {}
-            
-            if TeleportSystemV2.getLocationNames then
-                locations1 = TeleportSystemV2.getLocationNames(selectedGPSCategory)
-                print("📍 Method 1 (getLocationNames):", #locations1, "results")
-            end
-            
-            if TeleportSystemV2.getLocationsByCategory then
-                local locationData = TeleportSystemV2.getLocationsByCategory(selectedGPSCategory)
-                for _, loc in pairs(locationData) do
-                    if loc.name then
-                        table.insert(locations2, loc.name)
-                    end
-                end
-                print("📍 Method 2 (getLocationsByCategory):", #locations2, "results")
-            end
-            
-            -- Use the method that returns more results
-            local finalLocations = (#locations1 > #locations2) and locations1 or locations2
-            
-            if #finalLocations > 0 then
-                print("📍 Using", #finalLocations, "locations from better method")
-                selectedGPSLocation = finalLocations[1]
-                
-                -- Nuclear option: Try to recreate dropdown data
-                if GPSLocationDropdown then
-                    task.spawn(function()
-                        for i = 1, 5 do
-                            task.wait(i * 0.1)
-                            pcall(function()
-                                GPSLocationDropdown.Options = finalLocations
-                                if GPSLocationDropdown.Refresh then
-                                    GPSLocationDropdown:Refresh(finalLocations)
-                                end
-                                print("⚡ Nuclear attempt", i, "completed")
-                            end)
-                        end
+            end,
+        })
+    end
+    
+    -- Add global controls section
+    TeleportsTab:CreateSection("Global GPS Controls")
+    
+    local GPSTeleportButton = TeleportsTab:CreateButton({
+        Name = "ðŸŒ Quick Teleport (Last Selected)",
+        Callback = function()
+            if selectedGPSLocation and selectedGPSLocation ~= "" and selectedGPSCategory and selectedGPSCategory ~= "" then
+                if TeleportSystemV2.teleportToLocation then
+                    local success, msg = pcall(function()
+                        return TeleportSystemV2.teleportToLocation(selectedGPSLocation, selectedGPSCategory, selectedTeleportMethod)
                     end)
+                    
+                    if success and msg then
+                        message("âœ… Quick teleport to " .. selectedGPSLocation, 3)
+                    else
+                        message("âŒ Quick teleport failed: " .. tostring(msg), 3)
+                    end
+                else
+                    message("âŒ Teleport function not available", 3)
                 end
-                
-                message("⚡ FORCE SYNC: " .. selectedGPSCategory .. " (" .. #finalLocations .. " locations)", 3)
             else
-                message("❌ FORCE SYNC FAILED: No locations found", 3)
+                message("âŒ No location selected! Use category dropdowns above.", 3)
             end
-        else
-            message("❌ Force sync failed - system not ready", 3)
-        end
-    end,
-})
-
--- Add debug button to help troubleshoot GPS issues
-local DebugGPSButton = TeleportsTab:CreateButton({
-    Name = "🔍 Debug GPS Data",
-    Callback = function()
-        if TeleportSystemV2 then
-            local categories = TeleportSystemV2.getCategoryNames()
-            print("🔍 === GPS SYSTEM DEBUG ===")
-            print("📂 Total Categories:", #categories)
-            print("📍 Selected Category:", selectedGPSCategory or "None")
-            print("📍 Selected Location:", selectedGPSLocation or "None")
+        end,
+    })
+    
+    local StatsButton = TeleportsTab:CreateButton({
+        Name = "ðŸ“Š Show GPS Statistics",
+        Callback = function()
+            local totalLocations = 0
+            local msg = "ðŸ“Š GPS System V2 Statistics:\n\n"
             
-            -- Test different location retrieval methods
-            if selectedGPSCategory then
-                print("🧪 Testing location retrieval methods for:", selectedGPSCategory)
+            for _, categoryName in pairs(GPSCategories) do
+                local success, count = pcall(function()
+                    local locs = TeleportSystemV2.getLocationsByCategory(categoryName)
+                    return #locs
+                end)
                 
-                if TeleportSystemV2.getLocationNames then
-                    local names = TeleportSystemV2.getLocationNames(selectedGPSCategory)
-                    print("   getLocationNames():", #names, "results")
-                    for i = 1, math.min(3, #names) do
-                        print("     ", i, names[i])
-                    end
-                end
-                
-                if TeleportSystemV2.getLocationsByCategory then
-                    local objects = TeleportSystemV2.getLocationsByCategory(selectedGPSCategory)
-                    print("   getLocationsByCategory():", #objects, "results")
-                    for i = 1, math.min(3, #objects) do
-                        if objects[i] and objects[i].name then
-                            print("     ", i, objects[i].name)
-                        end
-                    end
+                if success then
+                    totalLocations = totalLocations + count
+                    msg = msg .. string.format("ðŸ“ %s: %d locations\n", categoryName, count)
+                else
+                    msg = msg .. string.format("ðŸ“ %s: Error loading\n", categoryName)
                 end
             end
             
-            print("� Dropdown Status:")
-            print("   GPSLocationDropdown exists:", GPSLocationDropdown ~= nil)
-            if GPSLocationDropdown then
-                print("   Has Refresh method:", GPSLocationDropdown.Refresh ~= nil)
-                print("   Has UpdateOptions method:", GPSLocationDropdown.UpdateOptions ~= nil)
-                print("   Has Options property:", GPSLocationDropdown.Options ~= nil)
-            end
-            print("🔍 === END DEBUG ===")
+            msg = msg .. string.format("\nðŸŒ Total Locations: %d\n", totalLocations)
+            msg = msg .. "ðŸš€ Current Method: " .. selectedTeleportMethod
             
-            local msg = "� GPS Debug Complete\nCheck console for details\n📂 Categories: " .. #categories .. 
-                       "\n📍 Current: " .. (selectedGPSCategory or "None")
-            message(msg, 8)
-        else
-            message("❌ TeleportSystemV2 not loaded", 3)
-            print("❌ TeleportSystemV2 is nil")
-        end
-    end,
-})
-
--- Alternative method: Quick category selection buttons
-TeleportsTab:CreateSection("Quick Category Selection")
-
-local QuickCategoryButton1 = TeleportsTab:CreateButton({
-    Name = "📍 Terrapin Island Area",
-    Callback = function()
-        selectedGPSCategory = "Terrapin Island Area"
-        if TeleportSystemV2 then
-            local locations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
-            selectedGPSLocation = locations[1] or ""
-            message("📂 Quick Select: Terrapin Island Area (" .. #locations .. " locations)", 3)
-        end
-    end,
-})
-
-local QuickCategoryButton2 = TeleportsTab:CreateButton({
-    Name = "🏛️ Ancient Isle Area", 
-    Callback = function()
-        selectedGPSCategory = "Ancient Isle Area"
-        if TeleportSystemV2 then
-            local locations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
-            selectedGPSLocation = locations[1] or ""
-            message("📂 Quick Select: Ancient Isle Area (" .. #locations .. " locations)", 3)
-        end
-    end,
-})
-
-local QuickCategoryButton3 = TeleportsTab:CreateButton({
-    Name = "🌊 Deep Ocean Areas",
-    Callback = function()
-        selectedGPSCategory = "Deep Ocean Areas"
-        if TeleportSystemV2 then
-            local locations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
-            selectedGPSLocation = locations[1] or ""
-            message("📂 Quick Select: Deep Ocean Areas (" .. #locations .. " locations)", 3)
-        end
-    end,
-})
-
--- Add variable for teleport method
-local selectedTeleportMethod = "CFrame"
-
-local TeleportMethodDropdown = TeleportsTab:CreateDropdown({
-    Name = "Teleport Method",
-    Options = {"CFrame", "TweenService", "RequestTeleportCFrame", "TeleportService"},
-    CurrentOption = selectedTeleportMethod,
-    Flag = "teleportmethod",
-    Callback = function(Option)
-        selectedTeleportMethod = Option
-        print("🔄 Teleport method changed to:", Option)
-    end,
-})
-
-local GPSTeleportButton = TeleportsTab:CreateButton({
-    Name = "🌍 GPS Teleport",
-    Callback = function()
-        if TeleportSystemV2 and selectedGPSCategory and selectedGPSLocation and selectedGPSLocation ~= "" then
-            local success, msg = TeleportSystemV2.teleportToLocation(selectedGPSLocation, selectedGPSCategory, selectedTeleportMethod)
-            message(success and ("✅ " .. msg) or ("❌ " .. msg), 3)
-        else
-            message("❌ Please select GPS category and location first", 3)
-        end
-    end,
-})
-
-local NearestLocationsButton = TeleportsTab:CreateButton({
-    Name = "📍 Find Nearest (5)",
-    Callback = function()
-        if TeleportSystemV2 and selectedGPSCategory then
-            local nearest = TeleportSystemV2.getNearestLocations(selectedGPSCategory, 5)
-            local msg = "🔍 Nearest locations in " .. selectedGPSCategory .. ":\n"
-            for i, item in pairs(nearest) do
-                msg = msg .. string.format("%d. %s (%.0f studs)\n", i, item.location.name, item.distance)
-            end
-            message(msg, 8)
-        else
-            message("❌ Select GPS category first", 3)
-        end
-    end,
-})
-
-TeleportsTab:CreateSection("Advanced Features")
-
-local AutoTreasureButton = TeleportsTab:CreateButton({
-    Name = "🏴‍☠️ Auto Treasure Hunt",
-    Callback = function()
-        local method = selectedTeleportMethod
-        TeleportSystemV2.autoTreasureHunt(3, method)
-        message("🏴‍☠️ Auto Treasure Hunt started!", 3)
-    end,
-})
-
-local BatchTeleportButton = TeleportsTab:CreateButton({
-    Name = "🚀 Batch Teleport (Category)",
-    Callback = function()
-        local category = selectedGPSCategory
-        local method = selectedTeleportMethod
-        local locations = TeleportSystemV2.getLocationsByCategory(category)
-        
-        if #locations > 10 then
-            message("⚠️ Too many locations (" .. #locations .. "). Use smaller categories.", 5)
-            return
-        end
-        
-        TeleportSystemV2.batchTeleport(locations, 2, method)
-        message("🚀 Batch teleport started for " .. category, 3)
-    end,
-})
-
-TeleportsTab:CreateSection("Search & Statistics")
-
-local SearchButton = TeleportsTab:CreateButton({
-    Name = "🔍 Search Locations",
-    Callback = function()
-        -- Simple search implementation (could be enhanced with text input)
-        local searchTerm = "island" -- Example search term
-        local results = TeleportSystemV2.searchLocations(searchTerm)
-        
-        local msg = "🔍 Search results for '" .. searchTerm .. "':\n"
-        for i, result in pairs(results) do
-            if i <= 10 then -- Limit to 10 results
-                msg = msg .. string.format("%d. %s (%s)\n", i, result.name, result.category)
-            end
-        end
-        
-        if #results > 10 then
-            msg = msg .. "... and " .. (#results - 10) .. " more results"
-        end
-        
-        message(msg, 10)
-    end,
-})
-
-local StatsButton = TeleportsTab:CreateButton({
-    Name = "📊 Show GPS Statistics",
-    Callback = function()
-        local categories = TeleportSystemV2.getCategoryNames()
-        local totalLocations = 0
-        local msg = "📊 GPS System V2 Statistics:\n\n"
-        
-        for _, category in pairs(categories) do
-            local count = #TeleportSystemV2.getLocationsByCategory(category)
-            totalLocations = totalLocations + count
-            msg = msg .. string.format("📁 %s: %d locations\n", category, count)
-        end
-        
-        msg = msg .. string.format("\n🌍 Total Locations: %d\n", totalLocations)
-        msg = msg .. "🚀 Methods: " .. table.concat(TeleportSystemV2.teleportMethods, ", ")
-        
-        message(msg, 15)
-    end,
-})
+            message(msg, 15)
+        end,
+    })
 
 else
     -- TeleportSystemV2 not available, show error message
     TeleportsTab:CreateSection("GPS System V2 - Error")
     
     local GPSErrorButton = TeleportsTab:CreateButton({
-        Name = "❌ GPS System Failed to Load",
+        Name = "âŒ GPS System Failed to Load",
         Callback = function()
-            message("❌ TeleportSystemV2 failed to load from GitHub.\nUsing legacy teleport system only.", 5)
+            message("âŒ TeleportSystemV2 failed to load from GitHub.\nUsing legacy teleport system only.", 5)
         end,
     })
     
     local RetryGPSButton = TeleportsTab:CreateButton({
-        Name = "🔄 Retry Loading GPS System",
+        Name = "ðŸ”„ Retry Loading GPS System",
         Callback = function()
-            message("🔄 Please restart the script to retry loading GPS system.", 3)
+            message("ðŸ”„ Please restart the script to retry loading GPS system.", 3)
         end,
     })
 end
-
 --// Visuals Tab
 VisualsTab:CreateSection("Rod")
 
@@ -1021,10 +687,10 @@ if InventoryExploits then
         Callback = function(Value)
             if Value then
                 InventoryExploits:StartAutoItemCollector()
-                message("✅ Auto Item Collector Started", 3)
+                message("âœ… Auto Item Collector Started", 3)
             else
                 InventoryExploits:StopAutoItemCollector()
-                message("⛔ Auto Item Collector Stopped", 3)
+                message("â›” Auto Item Collector Stopped", 3)
             end
         end,
     })
@@ -1036,10 +702,10 @@ if InventoryExploits then
         Callback = function(Value)
             if Value then
                 InventoryExploits:StartItemTeleporter()
-                message("✅ Item Teleporter Started", 3)
+                message("âœ… Item Teleporter Started", 3)
             else
                 InventoryExploits:StopItemTeleporter()
-                message("⛔ Item Teleporter Stopped", 3)
+                message("â›” Item Teleporter Stopped", 3)
             end
         end,
     })
@@ -1051,7 +717,7 @@ if InventoryExploits then
         Flag = "collectdelay",
         Callback = function(Option)
             InventoryExploits:SetCollectDelay(tonumber(Option))
-            message("🕐 Collection delay set to " .. Option .. "s", 2)
+            message("ðŸ• Collection delay set to " .. Option .. "s", 2)
         end,
     })
 
@@ -1062,7 +728,7 @@ if InventoryExploits then
         Flag = "teleportradius", 
         Callback = function(Option)
             InventoryExploits:SetTeleportRadius(tonumber(Option))
-            message("📡 Teleport radius set to " .. Option .. " studs", 2)
+            message("ðŸ“¡ Teleport radius set to " .. Option .. " studs", 2)
         end,
     })
 
@@ -1075,10 +741,10 @@ if InventoryExploits then
         Callback = function(Value)
             if Value then
                 InventoryExploits:StartInventoryDuplicator()
-                message("✅ Inventory Duplicator Started", 3)
+                message("âœ… Inventory Duplicator Started", 3)
             else
                 InventoryExploits:StopInventoryDuplicator()
-                message("⛔ Inventory Duplicator Stopped", 3)
+                message("â›” Inventory Duplicator Stopped", 3)
             end
         end,
     })
@@ -1090,7 +756,7 @@ if InventoryExploits then
         Flag = "maxduplicates",
         Callback = function(Option)
             InventoryExploits:SetMaxDuplicates(tonumber(Option))
-            message("🔢 Max duplicates set to " .. Option, 2)
+            message("ðŸ”¢ Max duplicates set to " .. Option, 2)
         end,
     })
 
@@ -1101,7 +767,7 @@ if InventoryExploits then
         Flag = "duplicatedelay",
         Callback = function(Option)
             InventoryExploits:SetDuplicateDelay(tonumber(Option))
-            message("⏱️ Duplicate delay set to " .. Option .. "s", 2)
+            message("â±ï¸ Duplicate delay set to " .. Option .. "s", 2)
         end,
     })
 
@@ -1114,29 +780,29 @@ if InventoryExploits then
         Callback = function(Value)
             if Value then
                 InventoryExploits:StartAutoEquipper()
-                message("✅ Auto Equipment Optimizer Started", 3)
+                message("âœ… Auto Equipment Optimizer Started", 3)
             else
                 InventoryExploits:StopAutoEquipper()
-                message("⛔ Auto Equipment Optimizer Stopped", 3)
+                message("â›” Auto Equipment Optimizer Stopped", 3)
             end
         end,
     })
 
     local SkinUnlockerButton = InventoryTab:CreateButton({
-        Name = "🎨 Unlock All Skins",
+        Name = "ðŸŽ¨ Unlock All Skins",
         Callback = function()
             InventoryExploits:StartSkinUnlocker()
-            message("🎨 Starting skin unlock process...", 3)
+            message("ðŸŽ¨ Starting skin unlock process...", 3)
         end,
     })
 
     InventoryTab:CreateSection("Control Center")
 
     local StartAllButton = InventoryTab:CreateButton({
-        Name = "🚀 Start All Systems",
+        Name = "ðŸš€ Start All Systems",
         Callback = function()
             InventoryExploits:StartAllSystems()
-            message("🚀 All inventory systems started!", 3)
+            message("ðŸš€ All inventory systems started!", 3)
             
             -- Update UI toggles
             Rayfield.Flags["autocollector"] = true
@@ -1147,10 +813,10 @@ if InventoryExploits then
     })
 
     local StopAllButton = InventoryTab:CreateButton({
-        Name = "⛔ Stop All Systems",
+        Name = "â›” Stop All Systems",
         Callback = function()
             InventoryExploits:StopAllSystems()
-            message("⛔ All inventory systems stopped!", 3)
+            message("â›” All inventory systems stopped!", 3)
             
             -- Update UI toggles
             Rayfield.Flags["autocollector"] = false
@@ -1161,26 +827,26 @@ if InventoryExploits then
     })
 
     local StatusButton = InventoryTab:CreateButton({
-        Name = "📊 Show Status",
+        Name = "ðŸ“Š Show Status",
         Callback = function()
             local status = InventoryExploits:GetStatus()
-            local msg = "📊 Inventory Status:\n\n"
-            msg = msg .. "🔄 Auto Collector: " .. (status.AutoItemCollector and "ON" or "OFF") .. "\n"
-            msg = msg .. "📦 Duplicator: " .. (status.InventoryDuplicator and "ON" or "OFF") .. "\n"
-            msg = msg .. "🎨 Skin Unlocker: " .. (status.SkinUnlocker and "ON" or "OFF") .. "\n"
-            msg = msg .. "⚡ Auto Equipper: " .. (status.AutoEquipper and "ON" or "OFF") .. "\n"
-            msg = msg .. "📡 Item Teleporter: " .. (status.ItemTeleporter and "ON" or "OFF") .. "\n\n"
-            msg = msg .. "📈 Items Collected: " .. (status.CollectedItems or 0) .. "\n"
-            msg = msg .. "📋 Items Duplicated: " .. (status.DuplicatedItems or 0)
+            local msg = "ðŸ“Š Inventory Status:\n\n"
+            msg = msg .. "ðŸ”„ Auto Collector: " .. (status.AutoItemCollector and "ON" or "OFF") .. "\n"
+            msg = msg .. "ðŸ“¦ Duplicator: " .. (status.InventoryDuplicator and "ON" or "OFF") .. "\n"
+            msg = msg .. "ðŸŽ¨ Skin Unlocker: " .. (status.SkinUnlocker and "ON" or "OFF") .. "\n"
+            msg = msg .. "âš¡ Auto Equipper: " .. (status.AutoEquipper and "ON" or "OFF") .. "\n"
+            msg = msg .. "ðŸ“¡ Item Teleporter: " .. (status.ItemTeleporter and "ON" or "OFF") .. "\n\n"
+            msg = msg .. "ðŸ“ˆ Items Collected: " .. (status.CollectedItems or 0) .. "\n"
+            msg = msg .. "ðŸ“‹ Items Duplicated: " .. (status.DuplicatedItems or 0)
             message(msg, 10)
         end,
     })
 
     local EmergencyStopButton = InventoryTab:CreateButton({
-        Name = "🚨 EMERGENCY STOP",
+        Name = "ðŸš¨ EMERGENCY STOP",
         Callback = function()
             InventoryExploits:EmergencyStop()
-            message("🚨 EMERGENCY STOP ACTIVATED!", 5)
+            message("ðŸš¨ EMERGENCY STOP ACTIVATED!", 5)
             
             -- Reset all UI toggles
             Rayfield.Flags["autocollector"] = false
@@ -1193,27 +859,27 @@ if InventoryExploits then
     InventoryTab:CreateSection("Advanced Options")
 
     local ClearDataButton = InventoryTab:CreateButton({
-        Name = "🗑️ Clear Duplicate Data",
+        Name = "ðŸ—‘ï¸ Clear Duplicate Data",
         Callback = function()
             InventoryExploits:ClearDuplicatedItems()
-            message("🗑️ Duplicated items data cleared", 3)
+            message("ðŸ—‘ï¸ Duplicated items data cleared", 3)
         end,
     })
 
     local ResetConfigButton = InventoryTab:CreateButton({
-        Name = "🔄 Reset Configuration",
+        Name = "ðŸ”„ Reset Configuration",
         Callback = function()
             InventoryExploits:ResetConfiguration()
-            message("🔄 Configuration reset to defaults", 3)
+            message("ðŸ”„ Configuration reset to defaults", 3)
         end,
     })
 else
     InventoryTab:CreateSection("Error")
     
     local ErrorLabel = InventoryTab:CreateButton({
-        Name = "❌ Inventory Module Failed to Load",
+        Name = "âŒ Inventory Module Failed to Load",
         Callback = function()
-            message("❌ Advanced Inventory Exploits module failed to load from GitHub", 5)
+            message("âŒ Advanced Inventory Exploits module failed to load from GitHub", 5)
         end,
     })
 end
@@ -1232,10 +898,10 @@ if EconomyExploits then
         Callback = function(Value)
             if Value then
                 EconomyExploits:StartMarketPriceManipulator()
-                message("💰 Market Price Manipulator Started", 3)
+                message("ðŸ’° Market Price Manipulator Started", 3)
             else
                 EconomyExploits:StopMarketPriceManipulator()
-                message("⛔ Market Price Manipulator Stopped", 3)
+                message("â›” Market Price Manipulator Stopped", 3)
             end
         end,
     })
@@ -1247,10 +913,10 @@ if EconomyExploits then
         Callback = function(Value)
             if Value then
                 EconomyExploits:StartUnlimitedShopRefresh()
-                message("🔄 Unlimited Shop Refresh Started", 3)
+                message("ðŸ”„ Unlimited Shop Refresh Started", 3)
             else
                 EconomyExploits:StopUnlimitedShopRefresh()
-                message("⛔ Shop Refresh Stopped", 3)
+                message("â›” Shop Refresh Stopped", 3)
             end
         end,
     })
@@ -1262,10 +928,10 @@ if EconomyExploits then
         Callback = function(Value)
             if Value then
                 EconomyExploits:StartFreePurchaseExploit()
-                message("💸 Free Purchase Exploit Started", 3)
+                message("ðŸ’¸ Free Purchase Exploit Started", 3)
             else
                 EconomyExploits:StopFreePurchaseExploit()
-                message("⛔ Free Purchase Stopped", 3)
+                message("â›” Free Purchase Stopped", 3)
             end
         end,
     })
@@ -1279,10 +945,10 @@ if EconomyExploits then
         Callback = function(Value)
             if Value then
                 EconomyExploits:StartAutoItemFlipper()
-                message("📈 Auto Item Flipper Started", 3)
+                message("ðŸ“ˆ Auto Item Flipper Started", 3)
             else
                 EconomyExploits:StopAutoItemFlipper()
-                message("⛔ Item Flipper Stopped", 3)
+                message("â›” Item Flipper Stopped", 3)
             end
         end,
     })
@@ -1294,10 +960,10 @@ if EconomyExploits then
         Callback = function(Value)
             if Value then
                 EconomyExploits:StartShopInventoryScanner()
-                message("🔍 Shop Scanner Started", 3)
+                message("ðŸ” Shop Scanner Started", 3)
             else
                 EconomyExploits:StopShopInventoryScanner()
-                message("⛔ Shop Scanner Stopped", 3)
+                message("â›” Shop Scanner Stopped", 3)
             end
         end,
     })
@@ -1311,7 +977,7 @@ if EconomyExploits then
         Flag = "maxspend",
         Callback = function(Option)
             EconomyExploits.Config.MaxSpendAmount = tonumber(Option)
-            message("💰 Max spend set to $" .. Option, 2)
+            message("ðŸ’° Max spend set to $" .. Option, 2)
         end,
     })
 
@@ -1323,7 +989,7 @@ if EconomyExploits then
         Callback = function(Option)
             local margin = tonumber(Option:gsub("%%", "")) / 100
             EconomyExploits.Config.MinProfitMargin = margin
-            message("📊 Min profit margin set to " .. Option, 2)
+            message("ðŸ“Š Min profit margin set to " .. Option, 2)
         end,
     })
 
@@ -1334,51 +1000,51 @@ if EconomyExploits then
         Flag = "refreshdelay",
         Callback = function(Option)
             EconomyExploits.Config.RefreshDelay = tonumber(Option)
-            message("⏱️ Refresh delay set to " .. Option .. "s", 2)
+            message("â±ï¸ Refresh delay set to " .. Option .. "s", 2)
         end,
     })
 
     EconomyTab:CreateSection("Quick Actions")
 
     local RefreshAllShopsButton = EconomyTab:CreateButton({
-        Name = "🔄 Refresh All Shops",
+        Name = "ðŸ”„ Refresh All Shops",
         Callback = function()
             EconomyExploits:RefreshAllShops()
-            message("🔄 All shops refreshed!", 3)
+            message("ðŸ”„ All shops refreshed!", 3)
         end,
     })
 
     local ScanForDealsButton = EconomyTab:CreateButton({
-        Name = "🔍 Scan for Deals",
+        Name = "ðŸ” Scan for Deals",
         Callback = function()
             EconomyExploits:ScanForFlipOpportunities()
-            message("🔍 Scanning for profitable deals...", 3)
+            message("ðŸ” Scanning for profitable deals...", 3)
         end,
     })
 
     local AttemptFreePurchasesButton = EconomyTab:CreateButton({
-        Name = "💸 Attempt Free Purchases",
+        Name = "ðŸ’¸ Attempt Free Purchases",
         Callback = function()
             EconomyExploits:AttemptFreePurchases()
-            message("💸 Attempting free purchases...", 3)
+            message("ðŸ’¸ Attempting free purchases...", 3)
         end,
     })
 
     local ManipulatePricesButton = EconomyTab:CreateButton({
-        Name = "💰 Manipulate Prices",
+        Name = "ðŸ’° Manipulate Prices",
         Callback = function()
             EconomyExploits:ManipulateMarketPrices()
-            message("💰 Attempting price manipulation...", 3)
+            message("ðŸ’° Attempting price manipulation...", 3)
         end,
     })
 
     EconomyTab:CreateSection("Control Center")
 
     local StartAllEconomyButton = EconomyTab:CreateButton({
-        Name = "🚀 Start All Economy Systems",
+        Name = "ðŸš€ Start All Economy Systems",
         Callback = function()
             EconomyExploits:StartAllSystems()
-            message("🚀 All economy systems started!", 3)
+            message("ðŸš€ All economy systems started!", 3)
             
             -- Update UI toggles
             Rayfield.Flags["marketpricemanipulator"] = true
@@ -1390,10 +1056,10 @@ if EconomyExploits then
     })
 
     local StopAllEconomyButton = EconomyTab:CreateButton({
-        Name = "⛔ Stop All Economy Systems",
+        Name = "â›” Stop All Economy Systems",
         Callback = function()
             EconomyExploits:StopAllSystems()
-            message("⛔ All economy systems stopped!", 3)
+            message("â›” All economy systems stopped!", 3)
             
             -- Update UI toggles
             Rayfield.Flags["marketpricemanipulator"] = false
@@ -1405,34 +1071,34 @@ if EconomyExploits then
     })
 
     local EconomyStatusButton = EconomyTab:CreateButton({
-        Name = "📊 Show Economy Status",
+        Name = "ðŸ“Š Show Economy Status",
         Callback = function()
             local status = EconomyExploits:GetStatus()
-            local msg = "📊 Economy Status:\n\n"
-            msg = msg .. "💰 Price Manipulator: " .. (status.MarketPriceManipulator and "ON" or "OFF") .. "\n"
-            msg = msg .. "🔄 Shop Refresh: " .. (status.UnlimitedShopRefresh and "ON" or "OFF") .. "\n"
-            msg = msg .. "📈 Item Flipper: " .. (status.AutoItemFlipper and "ON" or "OFF") .. "\n"
-            msg = msg .. "💸 Free Purchase: " .. (status.FreePurchaseExploit and "ON" or "OFF") .. "\n"
-            msg = msg .. "🔍 Shop Scanner: " .. (status.ShopInventoryScanner and "ON" or "OFF") .. "\n\n"
-            msg = msg .. "💵 Max Spend: $" .. (EconomyExploits.Config.MaxSpendAmount or 0) .. "\n"
-            msg = msg .. "📊 Min Profit: " .. string.format("%.0f%%", (EconomyExploits.Config.MinProfitMargin or 0) * 100)
+            local msg = "ðŸ“Š Economy Status:\n\n"
+            msg = msg .. "ðŸ’° Price Manipulator: " .. (status.MarketPriceManipulator and "ON" or "OFF") .. "\n"
+            msg = msg .. "ðŸ”„ Shop Refresh: " .. (status.UnlimitedShopRefresh and "ON" or "OFF") .. "\n"
+            msg = msg .. "ðŸ“ˆ Item Flipper: " .. (status.AutoItemFlipper and "ON" or "OFF") .. "\n"
+            msg = msg .. "ðŸ’¸ Free Purchase: " .. (status.FreePurchaseExploit and "ON" or "OFF") .. "\n"
+            msg = msg .. "ðŸ” Shop Scanner: " .. (status.ShopInventoryScanner and "ON" or "OFF") .. "\n\n"
+            msg = msg .. "ðŸ’µ Max Spend: $" .. (EconomyExploits.Config.MaxSpendAmount or 0) .. "\n"
+            msg = msg .. "ðŸ“Š Min Profit: " .. string.format("%.0f%%", (EconomyExploits.Config.MinProfitMargin or 0) * 100)
             message(msg, 10)
         end,
     })
 
     local MarketReportButton = EconomyTab:CreateButton({
-        Name = "📈 Generate Market Report",
+        Name = "ðŸ“ˆ Generate Market Report",
         Callback = function()
             EconomyExploits:PrintMarketReport()
-            message("📈 Market report generated in console", 5)
+            message("ðŸ“ˆ Market report generated in console", 5)
         end,
     })
 
     local EmergencyEconomyStopButton = EconomyTab:CreateButton({
-        Name = "🚨 EMERGENCY STOP",
+        Name = "ðŸš¨ EMERGENCY STOP",
         Callback = function()
             EconomyExploits:EmergencyStop()
-            message("🚨 ECONOMY EMERGENCY STOP ACTIVATED!", 5)
+            message("ðŸš¨ ECONOMY EMERGENCY STOP ACTIVATED!", 5)
             
             -- Reset all UI toggles
             Rayfield.Flags["marketpricemanipulator"] = false
@@ -1447,7 +1113,7 @@ else
     EconomyTab:CreateSection("Basic Economy Tools")
     
     local BasicMarketButton = EconomyTab:CreateButton({
-        Name = "🏪 Open Merchant",
+        Name = "ðŸª Open Merchant",
         Callback = function()
             -- Basic merchant teleport
             local success, error = pcall(function()
@@ -1458,32 +1124,32 @@ else
                 }
                 local randomLocation = merchantLocations[math.random(1, #merchantLocations)]
                 gethrp().CFrame = randomLocation
-                message("🏪 Teleported to Merchant!", 3)
+                message("ðŸª Teleported to Merchant!", 3)
             end)
             if not success then
-                message("❌ Failed to teleport to merchant", 3)
+                message("âŒ Failed to teleport to merchant", 3)
             end
         end,
     })
     
     local BasicShopButton = EconomyTab:CreateButton({
-        Name = "🛒 Find Rod Shop",
+        Name = "ðŸ›’ Find Rod Shop",
         Callback = function()
             local success, error = pcall(function()
                 -- Teleport to rod shop in Moosewood
                 gethrp().CFrame = CFrame.new(-1472.7, 149.4, -3014.5)
-                message("🎣 Teleported to Rod Shop!", 3)
+                message("ðŸŽ£ Teleported to Rod Shop!", 3)
             end)
             if not success then
-                message("❌ Failed to teleport to shop", 3)
+                message("âŒ Failed to teleport to shop", 3)
             end
         end,
     })
     
     local EconomyErrorLabel = EconomyTab:CreateButton({
-        Name = "ℹ️ Advanced Features Unavailable",
+        Name = "â„¹ï¸ Advanced Features Unavailable",
         Callback = function()
-            message("ℹ️ Advanced Economy & Marketplace features require additional modules.\n\n🔧 Basic economy tools are available above.", 5)
+            message("â„¹ï¸ Advanced Economy & Marketplace features require additional modules.\n\nðŸ”§ Basic economy tools are available above.", 5)
         end,
     })
 end
@@ -1713,14 +1379,14 @@ end)
 end) -- End of UI Content Creation pcall
 
 if contentSuccess then
-    print("✅ UI Content created successfully!")
+    print("âœ… UI Content created successfully!")
 else
-    print("❌ Failed to create UI Content:", tostring(contentError))
-    print("⚠️ UI will be visible but some features may not work")
+    print("âŒ Failed to create UI Content:", tostring(contentError))
+    print("âš ï¸ UI will be visible but some features may not work")
 end
 
 --// Hooks
-print("🔗 Setting up hooks...")
+print("ðŸ”— Setting up hooks...")
 if CheckFunc(hookmetamethod) then
     local old; old = hookmetamethod(game, "__namecall", function(self, ...)
         local method, args = getnamecallmethod(), {...}
@@ -1737,23 +1403,23 @@ if CheckFunc(hookmetamethod) then
         end
         return old(self, ...)
     end)
-    print("✅ Hooks set up successfully!")
+    print("âœ… Hooks set up successfully!")
 else
-    print("⚠️ hookmetamethod not available, hooks disabled")
+    print("âš ï¸ hookmetamethod not available, hooks disabled")
 end
 
-print("🎉 FISCH CHEAT HUB V2 LOADED SUCCESSFULLY! 🎉")
-print("📋 Features Available:")
-print("   🤖 Auto Fishing & Automation")
-print("   🚀 Advanced Teleport System (276+ locations)")
-print("   🎨 Visual Enhancements & Rod Chams")
-print("   📦 Inventory & Item Management")
-print("   💰 Economy & Marketplace Tools")
-print("🎮 UI should be visible now! Check your screen.")
-print("⚡ Ready to use - Enjoy fishing! ⚡")
+print("ðŸŽ‰ FISCH CHEAT HUB V2 LOADED SUCCESSFULLY! ðŸŽ‰")
+print("ðŸ“‹ Features Available:")
+print("   ðŸ¤– Auto Fishing & Automation")
+print("   ðŸš€ Advanced Teleport System (276+ locations)")
+print("   ðŸŽ¨ Visual Enhancements & Rod Chams")
+print("   ðŸ“¦ Inventory & Item Management")
+print("   ðŸ’° Economy & Marketplace Tools")
+print("ðŸŽ® UI should be visible now! Check your screen.")
+print("âš¡ Ready to use - Enjoy fishing! âš¡")
 
 --// Restore original error functions after UI is loaded
-print("🔊 Restoring original error functions...")
+print("ðŸ”Š Restoring original error functions...")
 warn = originalWarn
 error = originalError
-print("✅ Error functions restored!")
+print("âœ… Error functions restored!")
