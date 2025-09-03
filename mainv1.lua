@@ -154,11 +154,14 @@ local inventoryURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/m
 
 -- Load from GitHub only
 local success2, result2 = pcall(function()
-    return loadstring(game:HttpGet(inventoryURL))()
+    local code = game:HttpGet(inventoryURL)
+    print("📄 Inventory code length:", #code, "characters")
+    return loadstring(code)()
 end)
 
 if success2 and result2 then
     InventoryExploits = result2
+    print("📦 Inventory module type:", typeof(InventoryExploits))
     if InventoryExploits and typeof(InventoryExploits) == "table" and InventoryExploits.Initialize then
         local initSuccess, initError = pcall(function()
             InventoryExploits:Initialize()
@@ -171,6 +174,10 @@ if success2 and result2 then
         end
     else
         print("⚠️ Inventory Exploits loaded but is not a valid module")
+        print("⚠️ Module type:", typeof(InventoryExploits))
+        if InventoryExploits then
+            print("⚠️ Module keys:", table.concat(Object.keys and Object.keys(InventoryExploits) or {"unknown"}, ", "))
+        end
         InventoryExploits = nil
     end
 else
@@ -186,13 +193,32 @@ local economyURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/mai
 
 -- Try to load from GitHub first, fallback gracefully
 local success3, result3 = pcall(function()
-    return loadstring(game:HttpGet(economyURL))()
+    local code = game:HttpGet(economyURL)
+    print("📄 Economy code length:", #code, "characters")
+    return loadstring(code)()
 end)
 
 if success3 and result3 then
     EconomyExploits = result3
-    EconomyExploits:Initialize()
-    print("✅ Economy & Marketplace Exploits loaded from GitHub successfully!")
+    print("💰 Economy module type:", typeof(EconomyExploits))
+    if EconomyExploits and typeof(EconomyExploits) == "table" and EconomyExploits.Initialize then
+        local initSuccess, initError = pcall(function()
+            EconomyExploits:Initialize()
+        end)
+        if initSuccess then
+            print("✅ Economy & Marketplace Exploits loaded from GitHub successfully!")
+        else
+            print("⚠️ Economy Exploits loaded but failed to initialize:", initError)
+            EconomyExploits = nil
+        end
+    else
+        print("⚠️ Economy Exploits loaded but is not a valid module")
+        print("⚠️ Module type:", typeof(EconomyExploits))
+        if EconomyExploits then
+            print("⚠️ Module keys:", table.concat(Object.keys and Object.keys(EconomyExploits) or {"unknown"}, ", "))
+        end
+        EconomyExploits = nil
+    end
 else
     print("⚠️ Failed to load Economy Exploits from GitHub")
     print("⚠️ Error:", result3 or "Unknown error")
@@ -202,22 +228,46 @@ end
 
 --// Create UI
 print("🚀 Creating Rayfield UI Window...")
-local Window = Rayfield:CreateWindow({
-    Name = "Fisch Cheat Hub v2",
-    LoadingTitle = "Fisch Advanced Exploits Loading...",
-    LoadingSubtitle = "by YourName - Now with Inventory System",
-})
+local windowSuccess, Window = pcall(function()
+    return Rayfield:CreateWindow({
+        Name = "Fisch Cheat Hub v2",
+        LoadingTitle = "Fisch Advanced Exploits Loading...",
+        LoadingSubtitle = "by YourName - Now with Inventory System",
+    })
+end)
 
-print("✅ UI Window created successfully!")
+if windowSuccess and Window then
+    print("✅ UI Window created successfully!")
+else
+    print("❌ Failed to create UI Window:", tostring(Window))
+    return
+end
 
 --// Create Tabs
 print("📂 Creating UI Tabs...")
-local AutomationTab = Window:CreateTab({Name = "Automation"})
-local ModificationsTab = Window:CreateTab({Name = "Modifications"})
-local TeleportsTab = Window:CreateTab({Name = "Teleports"})
-local VisualsTab = Window:CreateTab({Name = "Visuals"})
-local InventoryTab = Window:CreateTab({Name = "Inventory"})
-local EconomyTab = Window:CreateTab({Name = "Economy"})
+local tabSuccess, tabs = pcall(function()
+    return {
+        AutomationTab = Window:CreateTab({Name = "Automation"}),
+        ModificationsTab = Window:CreateTab({Name = "Modifications"}),
+        TeleportsTab = Window:CreateTab({Name = "Teleports"}),
+        VisualsTab = Window:CreateTab({Name = "Visuals"}),
+        InventoryTab = Window:CreateTab({Name = "Inventory"}),
+        EconomyTab = Window:CreateTab({Name = "Economy"})
+    }
+end)
+
+if tabSuccess and tabs then
+    local AutomationTab = tabs.AutomationTab
+    local ModificationsTab = tabs.ModificationsTab
+    local TeleportsTab = tabs.TeleportsTab
+    local VisualsTab = tabs.VisualsTab
+    local InventoryTab = tabs.InventoryTab
+    local EconomyTab = tabs.EconomyTab
+    print("✅ UI Tabs created successfully!")
+else
+    print("❌ Failed to create UI Tabs:", tostring(tabs))
+    return
+end
 
 print("✅ All tabs created successfully!")
 
