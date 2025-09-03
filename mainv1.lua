@@ -463,20 +463,15 @@ local GPSCategoryDropdown = TeleportsTab:CreateDropdown({
         
         -- Update GPS locations for selected category
         if TeleportSystemV2 then
-            -- Debug: Check what function is available
-            print("🔍 Checking TeleportSystemV2 functions:")
-            print("getLocationNames:", type(TeleportSystemV2.getLocationNames))
-            print("getLocationsByCategory:", type(TeleportSystemV2.getLocationsByCategory))
-            
             local locations = {}
             
-            -- Try different methods to get locations
+            -- Try different methods to get locations for the selected category
             if TeleportSystemV2.getLocationNames then
                 locations = TeleportSystemV2.getLocationNames(Option)
-                print("📍 getLocationNames returned:", #locations, "locations")
+                print("📍 getLocationNames for '" .. Option .. "' returned:", #locations, "locations")
             elseif TeleportSystemV2.getLocationsByCategory then
                 local locationData = TeleportSystemV2.getLocationsByCategory(Option)
-                print("📍 getLocationsByCategory returned:", #locationData, "location objects")
+                print("📍 getLocationsByCategory for '" .. Option .. "' returned:", #locationData, "location objects")
                 
                 -- Extract location names from location objects
                 for _, loc in pairs(locationData) do
@@ -485,43 +480,83 @@ local GPSCategoryDropdown = TeleportsTab:CreateDropdown({
                     end
                 end
                 print("📍 Extracted", #locations, "location names")
-            else
-                print("❌ No location retrieval function found")
             end
             
+            -- Print first few locations for debugging
             if #locations > 0 then
+                print("📍 First 3 locations for '" .. Option .. "':")
+                for i = 1, math.min(3, #locations) do
+                    print("   " .. i .. ". " .. locations[i])
+                end
                 selectedGPSLocation = locations[1]
+            else
+                print("❌ No locations found for category '" .. Option .. "'")
+                selectedGPSLocation = ""
+            end
+            
+            -- FORCE update GPS Location dropdown with multiple aggressive methods
+            if GPSLocationDropdown then
+                -- Immediate update without delay
+                local updateSuccess = false
                 
-                -- Try to update GPS Location dropdown
-                if GPSLocationDropdown then
+                -- Method 1: Direct Refresh
+                local success1, err1 = pcall(function()
+                    if GPSLocationDropdown.Refresh then
+                        GPSLocationDropdown:Refresh(locations)
+                        print("✅ Method 1: Direct Refresh successful")
+                        updateSuccess = true
+                    end
+                end)
+                
+                -- Method 2: Options assignment
+                if not updateSuccess then
+                    local success2, err2 = pcall(function()
+                        GPSLocationDropdown.Options = locations
+                        print("✅ Method 2: Options assignment successful")
+                        updateSuccess = true
+                    end)
+                end
+                
+                -- Method 3: Force refresh with delay
+                if not updateSuccess then
                     task.spawn(function()
-                        task.wait(0.1)
-                        local success, err = pcall(function()
+                        task.wait(0.2)
+                        local success3, err3 = pcall(function()
                             if GPSLocationDropdown.Refresh then
                                 GPSLocationDropdown:Refresh(locations)
-                                print("✅ Dropdown refreshed with Refresh method")
-                            elseif GPSLocationDropdown.UpdateOptions then
-                                GPSLocationDropdown:UpdateOptions(locations)
-                                print("✅ Dropdown updated with UpdateOptions method")
                             else
                                 GPSLocationDropdown.Options = locations
-                                print("✅ Dropdown updated with direct Options assignment")
                             end
+                            print("✅ Method 3: Delayed refresh successful")
                         end)
-                        
-                        if success then
-                            print("✅ GPS Location dropdown updated successfully")
-                        else
-                            print("❌ Failed to update dropdown:", err)
+                        if not success3 then
+                            print("❌ Method 3 failed:", err3)
                         end
                     end)
                 end
                 
-                message("📂 Category: " .. Option .. " (" .. #locations .. " locations)", 2)
+                -- Method 4: Try to manually trigger update
+                task.spawn(function()
+                    task.wait(0.3)
+                    if GPSLocationDropdown.UpdateDropdown then
+                        GPSLocationDropdown:UpdateDropdown(locations)
+                        print("✅ Method 4: UpdateDropdown successful")
+                    end
+                end)
+                
+                if updateSuccess then
+                    print("✅ GPS Location dropdown updated successfully")
+                else
+                    print("⚠️ Dropdown update may need manual refresh")
+                end
             else
-                selectedGPSLocation = ""
-                message("❌ No locations found for category: " .. Option, 3)
-                print("❌ No locations found for category:", Option)
+                print("❌ GPSLocationDropdown is nil")
+            end
+            
+            if #locations > 0 then
+                message("📂 " .. Option .. " (" .. #locations .. " locations)", 2)
+            else
+                message("❌ No locations for: " .. Option, 3)
             end
         else
             message("❌ Teleport system not loaded", 3)
@@ -576,62 +611,134 @@ local RefreshGPSButton = TeleportsTab:CreateButton({
     Name = "🔄 Refresh GPS Locations",
     Callback = function()
         if TeleportSystemV2 and selectedGPSCategory then
-            print("🔄 Manual refresh for category:", selectedGPSCategory)
+            print("🔄 FORCE REFRESH for category:", selectedGPSCategory)
             
             local locations = {}
             
-            -- Try different methods to get locations
+            -- Get locations for CURRENT selected category
             if TeleportSystemV2.getLocationNames then
                 locations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
-                print("📍 getLocationNames returned:", #locations, "locations")
+                print("📍 FORCE: getLocationNames for '" .. selectedGPSCategory .. "' returned:", #locations, "locations")
             elseif TeleportSystemV2.getLocationsByCategory then
                 local locationData = TeleportSystemV2.getLocationsByCategory(selectedGPSCategory)
-                print("📍 getLocationsByCategory returned:", #locationData, "location objects")
+                print("📍 FORCE: getLocationsByCategory for '" .. selectedGPSCategory .. "' returned:", #locationData, "location objects")
                 
                 for _, loc in pairs(locationData) do
                     if loc.name then
                         table.insert(locations, loc.name)
                     end
                 end
-                print("📍 Extracted", #locations, "location names")
+                print("📍 FORCE: Extracted", #locations, "location names")
             end
             
             if #locations > 0 then
+                -- Print locations for verification
+                print("📍 FORCE: Locations for '" .. selectedGPSCategory .. "':")
+                for i = 1, math.min(5, #locations) do
+                    print("   " .. i .. ". " .. locations[i])
+                end
+                
                 selectedGPSLocation = locations[1]
                 
-                -- Force update GPS Location dropdown
+                -- AGGRESSIVE dropdown update
                 if GPSLocationDropdown then
-                    local success, err = pcall(function()
-                        if GPSLocationDropdown.Refresh then
-                            GPSLocationDropdown:Refresh(locations)
-                            print("✅ Used Refresh method")
-                        elseif GPSLocationDropdown.UpdateOptions then
-                            GPSLocationDropdown:UpdateOptions(locations)
-                            print("✅ Used UpdateOptions method")
-                        else
-                            GPSLocationDropdown.Options = locations
-                            print("✅ Used direct Options assignment")
-                        end
-                    end)
-                    
-                    if success then
-                        message("✅ GPS refreshed: " .. #locations .. " locations", 2)
-                        print("✅ Dropdown refreshed successfully with", #locations, "locations")
-                    else
-                        message("❌ Refresh failed: " .. tostring(err), 3)
-                        print("❌ Dropdown refresh failed:", err)
+                    -- Multiple simultaneous update attempts
+                    for attempt = 1, 3 do
+                        task.spawn(function()
+                            task.wait(attempt * 0.1)
+                            local success, err = pcall(function()
+                                if GPSLocationDropdown.Refresh then
+                                    GPSLocationDropdown:Refresh(locations)
+                                    print("✅ FORCE Attempt " .. attempt .. ": Refresh method")
+                                else
+                                    GPSLocationDropdown.Options = locations
+                                    print("✅ FORCE Attempt " .. attempt .. ": Options assignment")
+                                end
+                            end)
+                            if not success then
+                                print("❌ FORCE Attempt " .. attempt .. " failed:", err)
+                            end
+                        end)
                     end
+                    
+                    message("🔄 FORCE SYNC: " .. selectedGPSCategory .. " (" .. #locations .. " locations)", 3)
                 else
                     message("❌ GPS Location dropdown not found", 3)
                     print("❌ GPSLocationDropdown is nil")
                 end
             else
                 message("❌ No locations found for: " .. selectedGPSCategory, 3)
-                print("❌ No locations found for category:", selectedGPSCategory)
+                print("❌ FORCE: No locations found for category:", selectedGPSCategory)
             end
         else
             message("❌ Cannot refresh GPS - system not loaded", 3)
             print("❌ TeleportSystemV2 or selectedGPSCategory is nil")
+            print("   TeleportSystemV2:", TeleportSystemV2 ~= nil)
+            print("   selectedGPSCategory:", selectedGPSCategory or "nil")
+        end
+    end,
+})
+
+-- Add force sync button
+local ForceSyncButton = TeleportsTab:CreateButton({
+    Name = "⚡ Force Sync GPS",
+    Callback = function()
+        if TeleportSystemV2 and selectedGPSCategory then
+            print("⚡ FORCE SYNC INITIATED for:", selectedGPSCategory)
+            
+            -- Get all available categories to verify current selection
+            local allCategories = TeleportSystemV2.getCategoryNames()
+            print("📂 Available categories:", table.concat(allCategories, ", "))
+            print("📂 Currently selected:", selectedGPSCategory)
+            
+            -- Get locations using both methods and compare
+            local locations1 = {}
+            local locations2 = {}
+            
+            if TeleportSystemV2.getLocationNames then
+                locations1 = TeleportSystemV2.getLocationNames(selectedGPSCategory)
+                print("📍 Method 1 (getLocationNames):", #locations1, "results")
+            end
+            
+            if TeleportSystemV2.getLocationsByCategory then
+                local locationData = TeleportSystemV2.getLocationsByCategory(selectedGPSCategory)
+                for _, loc in pairs(locationData) do
+                    if loc.name then
+                        table.insert(locations2, loc.name)
+                    end
+                end
+                print("📍 Method 2 (getLocationsByCategory):", #locations2, "results")
+            end
+            
+            -- Use the method that returns more results
+            local finalLocations = (#locations1 > #locations2) and locations1 or locations2
+            
+            if #finalLocations > 0 then
+                print("📍 Using", #finalLocations, "locations from better method")
+                selectedGPSLocation = finalLocations[1]
+                
+                -- Nuclear option: Try to recreate dropdown data
+                if GPSLocationDropdown then
+                    task.spawn(function()
+                        for i = 1, 5 do
+                            task.wait(i * 0.1)
+                            pcall(function()
+                                GPSLocationDropdown.Options = finalLocations
+                                if GPSLocationDropdown.Refresh then
+                                    GPSLocationDropdown:Refresh(finalLocations)
+                                end
+                                print("⚡ Nuclear attempt", i, "completed")
+                            end)
+                        end
+                    end)
+                end
+                
+                message("⚡ FORCE SYNC: " .. selectedGPSCategory .. " (" .. #finalLocations .. " locations)", 3)
+            else
+                message("❌ FORCE SYNC FAILED: No locations found", 3)
+            end
+        else
+            message("❌ Force sync failed - system not ready", 3)
         end
     end,
 })
