@@ -150,7 +150,7 @@ end
 --// Load Advanced Inventory Exploits from GitHub
 print("📦 Loading Advanced Inventory Exploits from GitHub...")
 local InventoryExploits
-local inventoryURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/advanced_inventory_exploits.lua"
+local inventoryURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/advanced_inventory_exploits_simple.lua"
 
 -- Load from GitHub only
 local success2, result2 = pcall(function()
@@ -191,7 +191,7 @@ end
 --// Load Economy & Marketplace Exploits from GitHub
 print("💰 Loading Economy & Marketplace Exploits from GitHub...")
 local EconomyExploits
-local economyURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/economy_marketplace_exploits.lua"
+local economyURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/economy_marketplace_exploits_simple.lua"
 
 -- Try to load from GitHub first, fallback gracefully
 local success3, result3 = pcall(function()
