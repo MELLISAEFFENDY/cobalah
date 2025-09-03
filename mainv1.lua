@@ -331,6 +331,13 @@ local autoCastEnabled = false
 local autoShakeEnabled = false
 local autoReelEnabled = false
 
+-- Delay settings for automation features
+local autoCastDelay = 0.5
+local autoShakeDelay = 0.1
+local autoReelDelay = 0.5
+local perfectCastDelay = 0.1
+local alwaysCatchDelay = 0.1
+
 local contentSuccess, contentError = pcall(function()
 
 --// Automation Tab
@@ -401,6 +408,94 @@ local AutoReelToggle = AutomationTab:CreateToggle({
         else
             message("🎣 Auto Reel: DISABLED", 2)
         end
+    end,
+})
+
+--// Delay Settings Section
+AutomationTab:CreateSection("⏱️ Delay Settings")
+
+local AutoCastDelaySlider = AutomationTab:CreateSlider({
+    Name = "Auto Cast Delay (seconds)",
+    Range = {0.1, 3.0},
+    Increment = 0.1,
+    Suffix = "s",
+    CurrentValue = autoCastDelay,
+    Flag = "autocastdelay",
+    Callback = function(Value)
+        autoCastDelay = Value
+        message("⏱️ Auto Cast Delay: " .. Value .. "s", 1)
+    end,
+})
+
+local AutoShakeDelaySlider = AutomationTab:CreateSlider({
+    Name = "Auto Shake Delay (seconds)",
+    Range = {0.05, 1.0},
+    Increment = 0.05,
+    Suffix = "s",
+    CurrentValue = autoShakeDelay,
+    Flag = "autoshakedelay",
+    Callback = function(Value)
+        autoShakeDelay = Value
+        message("⏱️ Auto Shake Delay: " .. Value .. "s", 1)
+    end,
+})
+
+local AutoReelDelaySlider = AutomationTab:CreateSlider({
+    Name = "Auto Reel Delay (seconds)",
+    Range = {0.1, 2.0},
+    Increment = 0.1,
+    Suffix = "s",
+    CurrentValue = autoReelDelay,
+    Flag = "autoreeldelay",
+    Callback = function(Value)
+        autoReelDelay = Value
+        message("⏱️ Auto Reel Delay: " .. Value .. "s", 1)
+    end,
+})
+
+local PerfectCastDelaySlider = AutomationTab:CreateSlider({
+    Name = "Perfect Cast Delay (seconds)",
+    Range = {0.05, 0.5},
+    Increment = 0.01,
+    Suffix = "s",
+    CurrentValue = perfectCastDelay,
+    Flag = "perfectcastdelay",
+    Callback = function(Value)
+        perfectCastDelay = Value
+        message("⏱️ Perfect Cast Delay: " .. Value .. "s", 1)
+    end,
+})
+
+local AlwaysCatchDelaySlider = AutomationTab:CreateSlider({
+    Name = "Always Catch Delay (seconds)",
+    Range = {0.05, 0.5},
+    Increment = 0.01,
+    Suffix = "s",
+    CurrentValue = alwaysCatchDelay,
+    Flag = "alwayscatchdelay",
+    Callback = function(Value)
+        alwaysCatchDelay = Value
+        message("⏱️ Always Catch Delay: " .. Value .. "s", 1)
+    end,
+})
+
+local ResetDelayButton = AutomationTab:CreateButton({
+    Name = "🔄 Reset All Delays to Default",
+    Callback = function()
+        autoCastDelay = 0.5
+        autoShakeDelay = 0.1
+        autoReelDelay = 0.5
+        perfectCastDelay = 0.1
+        alwaysCatchDelay = 0.1
+        
+        -- Update sliders
+        AutoCastDelaySlider:Set(autoCastDelay)
+        AutoShakeDelaySlider:Set(autoShakeDelay)
+        AutoReelDelaySlider:Set(autoReelDelay)
+        PerfectCastDelaySlider:Set(perfectCastDelay)
+        AlwaysCatchDelaySlider:Set(alwaysCatchDelay)
+        
+        message("🔄 All delays reset to default values!", 2)
     end,
 })
 
@@ -1494,6 +1589,7 @@ RunService.Heartbeat:Connect(function()
         if FindChild(lp.PlayerGui, 'shakeui') and FindChild(lp.PlayerGui['shakeui'], 'safezone') and FindChild(lp.PlayerGui['shakeui']['safezone'], 'button') then
             GuiService.SelectedObject = lp.PlayerGui['shakeui']['safezone']['button']
             if GuiService.SelectedObject == lp.PlayerGui['shakeui']['safezone']['button'] then
+                task.wait(autoShakeDelay)
                 game:GetService('VirtualInputManager'):SendKeyEvent(true, Enum.KeyCode.Return, false, game)
                 game:GetService('VirtualInputManager'):SendKeyEvent(false, Enum.KeyCode.Return, false, game)
             end
@@ -1502,14 +1598,14 @@ RunService.Heartbeat:Connect(function()
     
     if autoCastEnabled then
         local rod = FindRod()
-        if rod ~= nil and rod['values']['lure'].Value <= .001 and task.wait(.5) then
+        if rod ~= nil and rod['values']['lure'].Value <= .001 and task.wait(autoCastDelay) then
             rod.events.cast:FireServer(100, 1)
         end
     end
     
     if autoReelEnabled then
         local rod = FindRod()
-        if rod ~= nil and rod['values']['lure'].Value == 100 and task.wait(.5) then
+        if rod ~= nil and rod['values']['lure'].Value == 100 and task.wait(autoReelDelay) then
             ReplicatedStorage.events.reelfinished:FireServer(100, true)
         end
     end
