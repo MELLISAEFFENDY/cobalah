@@ -278,6 +278,17 @@ local windowSuccess, Window = pcall(function()
         Name = "Fisch Cheat Hub v2",
         LoadingTitle = "Fisch Advanced Exploits Loading...",
         LoadingSubtitle = "by YourName - Now with Inventory System",
+        ConfigurationSaving = {
+            Enabled = false,
+            FolderName = nil,
+            FileName = "FischHub"
+        },
+        Discord = {
+            Enabled = false,
+            Invite = "noinvitelink",
+            RememberJoins = true
+        },
+        KeySystem = false
     })
 end)
 
@@ -293,12 +304,12 @@ print("📂 Creating UI Tabs...")
 local AutomationTab, ModificationsTab, TeleportsTab, VisualsTab, InventoryTab, EconomyTab
 
 local tabSuccess, tabError = pcall(function()
-    AutomationTab = Window:CreateTab({Name = "Automation"})
-    ModificationsTab = Window:CreateTab({Name = "Modifications"})
-    TeleportsTab = Window:CreateTab({Name = "Teleports"})
-    VisualsTab = Window:CreateTab({Name = "Visuals"})
-    InventoryTab = Window:CreateTab({Name = "Inventory"})
-    EconomyTab = Window:CreateTab({Name = "Economy"})
+    AutomationTab = Window:CreateTab("Automation", 4483362458) -- Name, Image
+    ModificationsTab = Window:CreateTab("Modifications", 4483362458)
+    TeleportsTab = Window:CreateTab("Teleports", 4483362458)
+    VisualsTab = Window:CreateTab("Visuals", 4483362458)
+    InventoryTab = Window:CreateTab("Inventory", 4483362458)
+    EconomyTab = Window:CreateTab("Economy", 4483362458)
 end)
 
 if tabSuccess then
@@ -316,7 +327,7 @@ print("🎨 Creating UI Content...")
 local contentSuccess, contentError = pcall(function()
 
 --// Automation Tab
-AutomationTab:CreateSection({Name = "Autofarm"})
+AutomationTab:CreateSection("Autofarm")
 
 local FreezeCharToggle = AutomationTab:CreateToggle({
     Name = "Freeze Character",
@@ -366,7 +377,7 @@ local AutoReelToggle = AutomationTab:CreateToggle({
 
 --// Modifications Tab
 if CheckFunc(hookmetamethod) then
-    ModificationsTab:CreateSection({Name = "Hooks"})
+    ModificationsTab:CreateSection("Hooks")
     
     local NoAFKToggle = ModificationsTab:CreateToggle({
         Name = "No AFK Text",
@@ -396,7 +407,7 @@ if CheckFunc(hookmetamethod) then
     })
 end
 
-ModificationsTab:CreateSection({Name = "Client"})
+ModificationsTab:CreateSection("Client")
 
 local InfOxygenToggle = ModificationsTab:CreateToggle({
     Name = "Infinite Oxygen",
@@ -417,7 +428,7 @@ local NoPeaksSystemsToggle = ModificationsTab:CreateToggle({
 })
 
 --// Teleports Tab
-TeleportsTab:CreateSection({Name = "Legacy Locations"})
+TeleportsTab:CreateSection("Legacy Locations")
 
 local ZonesDropdown = TeleportsTab:CreateDropdown({
     Name = "Zones",
@@ -459,7 +470,7 @@ local TeleportToRodButton = TeleportsTab:CreateButton({
     end,
 })
 
-TeleportsTab:CreateSection({Name = "GPS System V2 (276 Locations)"})
+TeleportsTab:CreateSection("GPS System V2 (276 Locations)")
 
 -- Get GPS categories and create dropdown
 local GPSCategories = TeleportSystemV2.getCategoryNames()
@@ -566,7 +577,7 @@ local NearestLocationsButton = TeleportsTab:CreateButton({
     end,
 })
 
-TeleportsTab:CreateSection({Name = "Advanced Features"})
+TeleportsTab:CreateSection("Advanced Features")
 
 local AutoTreasureButton = TeleportsTab:CreateButton({
     Name = "🏴‍☠️ Auto Treasure Hunt",
@@ -594,7 +605,7 @@ local BatchTeleportButton = TeleportsTab:CreateButton({
     end,
 })
 
-TeleportsTab:CreateSection({Name = "Search & Statistics"})
+TeleportsTab:CreateSection("Search & Statistics")
 
 local SearchButton = TeleportsTab:CreateButton({
     Name = "🔍 Search Locations",
@@ -639,7 +650,7 @@ local StatsButton = TeleportsTab:CreateButton({
 })
 
 --// Visuals Tab
-VisualsTab:CreateSection({Name = "Rod"})
+VisualsTab:CreateSection("Rod")
 
 local BodyRodChamsToggle = VisualsTab:CreateToggle({
     Name = "Body Rod Chams",
@@ -669,7 +680,7 @@ local MaterialDropdown = VisualsTab:CreateDropdown({
     end,
 })
 
-VisualsTab:CreateSection({Name = "Fish Abundance"})
+VisualsTab:CreateSection("Fish Abundance")
 
 local FishAbundanceToggle = VisualsTab:CreateToggle({
     Name = "Free Fish Radar",
@@ -682,7 +693,7 @@ local FishAbundanceToggle = VisualsTab:CreateToggle({
 
 --// Inventory Tab
 if InventoryExploits then
-    InventoryTab:CreateSection({Name = "Item Collection"})
+    InventoryTab:CreateSection("Item Collection")
 
     local AutoCollectorToggle = InventoryTab:CreateToggle({
         Name = "Auto Item Collector",
@@ -736,7 +747,7 @@ if InventoryExploits then
         end,
     })
 
-    InventoryTab:CreateSection({Name = "Item Duplication"})
+    InventoryTab:CreateSection("Item Duplication")
 
     local InventoryDuplicatorToggle = InventoryTab:CreateToggle({
         Name = "Inventory Duplicator",
@@ -775,7 +786,7 @@ if InventoryExploits then
         end,
     })
 
-    InventoryTab:CreateSection({Name = "Equipment & Skins"})
+    InventoryTab:CreateSection("Equipment & Skins")
 
     local AutoEquipperToggle = InventoryTab:CreateToggle({
         Name = "Auto Equipment Optimizer",
@@ -800,7 +811,7 @@ if InventoryExploits then
         end,
     })
 
-    InventoryTab:CreateSection({Name = "Control Center"})
+    InventoryTab:CreateSection("Control Center")
 
     local StartAllButton = InventoryTab:CreateButton({
         Name = "🚀 Start All Systems",
@@ -860,7 +871,7 @@ if InventoryExploits then
         end,
     })
 
-    InventoryTab:CreateSection({Name = "Advanced Options"})
+    InventoryTab:CreateSection("Advanced Options")
 
     local ClearDataButton = InventoryTab:CreateButton({
         Name = "🗑️ Clear Duplicate Data",
@@ -1110,7 +1121,7 @@ if EconomyExploits then
         end,
     })
 else
-    EconomyTab:CreateSection({Name = "Error"})
+    EconomyTab:CreateSection("Error")
     
     local EconomyErrorLabel = EconomyTab:CreateButton({
         Name = "❌ Economy Module Failed to Load",
