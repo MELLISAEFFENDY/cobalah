@@ -158,44 +158,33 @@ message = function(text, time)
     end)
 end
 
---// Load Rayfield UI from GitHub
-print("🎨 Loading Rayfield UI from GitHub...")
+--// Load Local Rayfield UI
+print("🎨 Loading Local Rayfield UI...")
 local Rayfield
-local rayfieldURL = "https://sirius.menu/rayfield" -- Using more stable Rayfield version
 
--- Load from GitHub with error suppression
+-- Load from local file
 local success, result = pcall(function()
-    -- Suppress Rayfield errors temporarily
-    local oldWarn = warn
-    local oldError = error
-    warn = function(...) end
-    error = function(...) end
-    
-    local rayfield = loadstring(game:HttpGet(rayfieldURL))()
-    
-    -- Restore original functions
-    warn = oldWarn
-    error = oldError
-    
-    return rayfield
+    print("📁 Loading from local rayfield.lua file...")
+    return loadstring(readfile("rayfield.lua"))()
 end)
 
 if success and result then
     Rayfield = result
-    print("✅ Rayfield UI loaded from stable source successfully!")
+    print("✅ Local Rayfield UI loaded successfully!")
 else
-    print("❌ Failed to load Rayfield UI from stable source. Trying backup...")
-    -- Fallback to original source
+    print("❌ Failed to load local Rayfield UI. Error:", result)
+    print("📦 Trying fallback from GitHub...")
+    
+    -- Fallback to GitHub
     local success2, result2 = pcall(function()
-        return loadstring(game:HttpGet("https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/rayfield.lua"))()
+        return loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
     end)
     
     if success2 and result2 then
         Rayfield = result2
-        print("✅ Rayfield UI loaded from backup successfully!")
+        print("✅ Rayfield UI loaded from GitHub fallback!")
     else
-        print("❌ CRITICAL ERROR: Cannot load Rayfield UI from any source!")
-        return
+        error("❌ Cannot load Rayfield UI from any source!")
     end
 end
 
