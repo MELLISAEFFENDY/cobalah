@@ -511,11 +511,13 @@ local TeleportToRodButton = TeleportsTab:CreateButton({
 
 TeleportsTab:CreateSection("GPS System V2 (276 Locations)")
 
--- Get GPS categories and create dropdown
-local GPSCategories = TeleportSystemV2.getCategoryNames()
-local GPSLocationDropdown -- Forward declaration
-local selectedGPSCategory = GPSCategories[1] or "Terrapin Island Area"
-local selectedGPSLocation = ""
+-- Check if TeleportSystemV2 is available before creating GPS components
+if TeleportSystemV2 and TeleportSystemV2.getCategoryNames then
+    -- Get GPS categories and create dropdown
+    local GPSCategories = TeleportSystemV2.getCategoryNames()
+    local GPSLocationDropdown -- Forward declaration
+    local selectedGPSCategory = GPSCategories[1] or "Terrapin Island Area"
+    local selectedGPSLocation = ""
 
 local GPSCategoryDropdown = TeleportsTab:CreateDropdown({
     Name = "GPS Categories",
@@ -611,19 +613,6 @@ local GPSCategoryDropdown = TeleportsTab:CreateDropdown({
         if not success then
             print("❌ GPS Category Callback Error:", tostring(callbackError))
             message("❌ GPS refresh error: " .. tostring(callbackError), 5)
-        end
-    end,
-                            end
-                        end)
-                    end
-                end
-            else
-                print("❌ GPSLocationDropdown is nil")
-                message("⚠️ GPS Location dropdown not ready. Use refresh button.", 3)
-            end
-        else
-            print("❌ No locations found for category:", Option)
-            message("📂 Category: " .. Option .. " (No locations found)", 2)
         end
     end,
 })
@@ -934,6 +923,25 @@ local StatsButton = TeleportsTab:CreateButton({
         message(msg, 15)
     end,
 })
+
+else
+    -- TeleportSystemV2 not available, show error message
+    TeleportsTab:CreateSection("GPS System V2 - Error")
+    
+    local GPSErrorButton = TeleportsTab:CreateButton({
+        Name = "❌ GPS System Failed to Load",
+        Callback = function()
+            message("❌ TeleportSystemV2 failed to load from GitHub.\nUsing legacy teleport system only.", 5)
+        end,
+    })
+    
+    local RetryGPSButton = TeleportsTab:CreateButton({
+        Name = "🔄 Retry Loading GPS System",
+        Callback = function()
+            message("🔄 Please restart the script to retry loading GPS system.", 3)
+        end,
+    })
+end
 
 --// Visuals Tab
 VisualsTab:CreateSection("Rod")
