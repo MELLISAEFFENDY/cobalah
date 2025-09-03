@@ -10,6 +10,16 @@ print("⏰ Loading Time: " .. os.date("%H:%M:%S"))
 
 --// Variables
 local lp = Players.LocalPlayer
+
+-- Wait for player to fully load
+if not lp then
+    Players.PlayerAdded:Wait()
+    lp = Players.LocalPlayer
+end
+
+-- Wait for character to spawn
+local character = lp.Character or lp.CharacterAdded:Wait()
+
 local fishabundancevisible = false
 local deathcon
 local tooltipmessage
@@ -569,14 +579,40 @@ else
     
     -- Fallback to original Rayfield source
     local success2, result2 = pcall(function()
-        return loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+        local code = game:HttpGet("https://sirius.menu/rayfield", true)
+        if code and #code > 100 then
+            return loadstring(code)()
+        else
+            error("Invalid or empty code from original source")
+        end
     end)
     
     if success2 and result2 then
         Rayfield = result2
         print("✅ Rayfield UI loaded from original source fallback!")
     else
-        error("❌ Cannot load Rayfield UI from any source!")
+        print("❌ Cannot load Rayfield UI from any source!")
+        print("Error:", tostring(result2))
+        print("⚠️ Script will continue but UI may not work properly")
+        
+        -- Create a minimal Rayfield mock to prevent script crash
+        Rayfield = {
+            CreateWindow = function() 
+                return {
+                    CreateTab = function() 
+                        return {
+                            CreateSection = function() end,
+                            CreateToggle = function() return {CurrentValue = false} end,
+                            CreateDropdown = function() return {CurrentValue = ""} end,
+                            CreateButton = function() return {} end,
+                            CreateSlider = function() return {CurrentValue = 0} end
+                        }
+                    end
+                }
+            end,
+            Flags = {}
+        }
+        print("⚙️ Minimal Rayfield mock created to prevent crashes")
     end
 end
 
@@ -2031,6 +2067,12 @@ end
 
 --// Main Loop
 RunService.Heartbeat:Connect(function()
+    -- Get current rod material or default to ForceField
+    local currentRodMaterial = "ForceField"
+    if Rayfield and Rayfield.Flags and Rayfield.Flags['rodmaterial'] then
+        currentRodMaterial = Rayfield.Flags['rodmaterial']
+    end
+    
     -- Autofarm
     if freezeCharEnabled then
         if freezeCharMode == 'Toggled' then
@@ -2086,7 +2128,7 @@ RunService.Heartbeat:Connect(function()
     end
 
     -- Visuals
-    if Rayfield.Flags['rodchams'] then
+    if Rayfield and Rayfield.Flags and Rayfield.Flags['rodchams'] then
         local rod = FindRod()
         if rod ~= nil and FindChild(rod, 'Details') then
             local rodName = tostring(rod)
@@ -2102,24 +2144,24 @@ RunService.Heartbeat:Connect(function()
                     if RodMaterials[rodName][v.Name..i] == nil then
                         if v.Material == Enum.Material.Neon then
                             RodMaterials[rodName][v.Name..i] = Enum.Material.Neon
-                        elseif v.Material ~= Enum.Material.ForceField and v.Material ~= Enum.Material[Rayfield.Flags['rodmaterial']] then
+                        elseif v.Material ~= Enum.Material.ForceField and v.Material ~= Enum.Material[currentRodMaterial] then
                             RodMaterials[rodName][v.Name..i] = v.Material
                         end
                     end
-                    v.Material = Enum.Material[Rayfield.Flags['rodmaterial']]
+                    v.Material = Enum.Material[currentRodMaterial]
                     v.Color = Color3.fromRGB(100, 100, 255)
                 end
             end
             if rod['handle'].Color ~= Color3.fromRGB(100, 100, 255) then
                 RodColors[rodName]['handle'] = rod['handle'].Color
             end
-            if rod['handle'].Material ~= Enum.Material.ForceField and rod['handle'].Material ~= Enum.Material.Neon and rod['handle'].Material ~= Enum.Material[Rayfield.Flags['rodmaterial']] then
+            if rod['handle'].Material ~= Enum.Material.ForceField and rod['handle'].Material ~= Enum.Material.Neon and rod['handle'].Material ~= Enum.Material[currentRodMaterial] then
                 RodMaterials[rodName]['handle'] = rod['handle'].Material
             end
-            rod['handle'].Material = Enum.Material[Rayfield.Flags['rodmaterial']]
+            rod['handle'].Material = Enum.Material[currentRodMaterial]
             rod['handle'].Color = Color3.fromRGB(100, 100, 255)
         end
-    elseif not Rayfield.Flags['rodchams'] then
+    elseif not (Rayfield and Rayfield.Flags and Rayfield.Flags['rodchams']) then
         local rod = FindRod()
         if rod ~= nil and FindChild(rod, 'Details') then
             local rodName = tostring(rod)
@@ -2140,7 +2182,7 @@ RunService.Heartbeat:Connect(function()
         end
     end
     
-    if Rayfield.Flags['bodyrodchams'] then
+    if Rayfield and Rayfield.Flags and Rayfield.Flags['bodyrodchams'] then
         local rod = getchar():FindFirstChild('RodBodyModel')
         if rod ~= nil and FindChild(rod, 'Details') then
             local rodName = tostring(rod)
@@ -2156,24 +2198,24 @@ RunService.Heartbeat:Connect(function()
                     if RodMaterials[rodName][v.Name..i] == nil then
                         if v.Material == Enum.Material.Neon then
                             RodMaterials[rodName][v.Name..i] = Enum.Material.Neon
-                        elseif v.Material ~= Enum.Material.ForceField and v.Material ~= Enum.Material[Rayfield.Flags['rodmaterial']] then
+                        elseif v.Material ~= Enum.Material.ForceField and v.Material ~= Enum.Material[currentRodMaterial] then
                             RodMaterials[rodName][v.Name..i] = v.Material
                         end
                     end
-                    v.Material = Enum.Material[Rayfield.Flags['rodmaterial']]
+                    v.Material = Enum.Material[currentRodMaterial]
                     v.Color = Color3.fromRGB(100, 100, 255)
                 end
             end
             if rod['handle'].Color ~= Color3.fromRGB(100, 100, 255) then
                 RodColors[rodName]['handle'] = rod['handle'].Color
             end
-            if rod['handle'].Material ~= Enum.Material.ForceField and rod['handle'].Material ~= Enum.Material.Neon and rod['handle'].Material ~= Enum.Material[Rayfield.Flags['rodmaterial']] then
+            if rod['handle'].Material ~= Enum.Material.ForceField and rod['handle'].Material ~= Enum.Material.Neon and rod['handle'].Material ~= Enum.Material[currentRodMaterial] then
                 RodMaterials[rodName]['handle'] = rod['handle'].Material
             end
-            rod['handle'].Material = Enum.Material[Rayfield.Flags['rodmaterial']]
+            rod['handle'].Material = Enum.Material[currentRodMaterial]
             rod['handle'].Color = Color3.fromRGB(100, 100, 255)
         end
-    elseif not Rayfield.Flags['bodyrodchams'] then
+    elseif not (Rayfield and Rayfield.Flags and Rayfield.Flags['bodyrodchams']) then
         local rod = getchar():FindFirstChild('RodBodyModel')
         if rod ~= nil and FindChild(rod, 'Details') then
             local rodName = tostring(rod)
@@ -2194,7 +2236,7 @@ RunService.Heartbeat:Connect(function()
         end
     end
     
-    if Rayfield.Flags['fishabundance'] then
+    if Rayfield and Rayfield.Flags and Rayfield.Flags['fishabundance'] then
         if not fishabundancevisible then
             message('\\<b><font color = \"#9eff80\">Fish Abundance Zones</font></b>\\ are now visible', 5)
         end
@@ -2204,7 +2246,7 @@ RunService.Heartbeat:Connect(function()
                 v['radar2'].Enabled = true
             end
         end
-        fishabundancevisible = Rayfield.Flags['fishabundance']
+        fishabundancevisible = (Rayfield and Rayfield.Flags and Rayfield.Flags['fishabundance']) or false
     else
         if fishabundancevisible then
             message('\\<b><font color = \"#9eff80\">Fish Abundance Zones</font></b>\\ are no longer visible', 5)
@@ -2215,11 +2257,11 @@ RunService.Heartbeat:Connect(function()
                 v['radar2'].Enabled = false
             end
         end
-        fishabundancevisible = Rayfield.Flags['fishabundance']
+        fishabundancevisible = (Rayfield and Rayfield.Flags and Rayfield.Flags['fishabundance']) or false
     end
 
     -- Modifications
-    if Rayfield.Flags['infoxygen'] then
+    if Rayfield and Rayfield.Flags and Rayfield.Flags['infoxygen'] then
         if not deathcon then
             deathcon = gethum().Died:Connect(function()
                 task.delay(9, function()
@@ -2250,7 +2292,7 @@ RunService.Heartbeat:Connect(function()
         end
     end
     
-    if Rayfield.Flags['nopeakssystems'] then
+    if Rayfield and Rayfield.Flags and Rayfield.Flags['nopeakssystems'] then
         getchar():SetAttribute('WinterCloakEquipped', true)
         getchar():SetAttribute('Refill', true)
     else
@@ -2306,3 +2348,4 @@ print("🔊 Restoring original error functions...")
 warn = originalWarn
 error = originalError
 print("✅ Error functions restored!")
+
