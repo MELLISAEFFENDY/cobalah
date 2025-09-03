@@ -15,6 +15,28 @@ local deathcon
 local tooltipmessage
 local characterposition
 
+-- State tracking variables for main loop
+local freezeCharEnabled = false
+local freezeCharMode = "Toggled"
+local autoCastEnabled = false
+local autoShakeEnabled = false
+local autoReelEnabled = false
+
+-- Delay settings for automation features
+local autoCastDelay = 0.5
+local autoShakeDelay = 0.1
+local autoReelDelay = 0.5
+local perfectCastDelay = 0.1
+local alwaysCatchDelay = 0.1
+
+-- AI Player Detection System variables
+local playerDetectionEnabled = false
+local detectionRadius = 15 -- meters
+local slowModeMultiplier = 3.0 -- delay multiplier when players nearby
+local nearbyPlayers = {}
+local lastDetectionCheck = 0
+local detectionInterval = 1 -- check every 1 second
+
 print("✅ Variables initialized successfully!")
 
 --// Functions (moved up to fix scope issues)
@@ -693,28 +715,6 @@ print("✅ All tabs created successfully!")
 
 --// Create UI Content with Error Handling
 print("🎨 Creating UI Content...")
-
--- State tracking variables for main loop
-local freezeCharEnabled = false
-local freezeCharMode = "Toggled"
-local autoCastEnabled = false
-local autoShakeEnabled = false
-local autoReelEnabled = false
-
--- Delay settings for automation features
-local autoCastDelay = 0.5
-local autoShakeDelay = 0.1
-local autoReelDelay = 0.5
-local perfectCastDelay = 0.1
-local alwaysCatchDelay = 0.1
-
--- AI Player Detection System
-local playerDetectionEnabled = false
-local detectionRadius = 15 -- meters
-local slowModeMultiplier = 3.0 -- delay multiplier when players nearby
-local nearbyPlayers = {}
-local lastDetectionCheck = 0
-local detectionInterval = 1 -- check every 1 second
 
 local contentSuccess, contentError = pcall(function()
 
