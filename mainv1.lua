@@ -526,31 +526,69 @@ local GPSCategoryDropdown = TeleportsTab:CreateDropdown({
         print("🔄 GPS Category changed to:", Option)
         selectedGPSCategory = Option
         
+        -- Force immediate location update
+        wait(0.1) -- Small delay to ensure dropdown is ready
+        
         -- Update location dropdown when category changes
         local locations = TeleportSystemV2.getLocationNames(Option)
         print("📍 Found", #locations, "locations for category:", Option)
         
-        if GPSLocationDropdown and locations and #locations > 0 then
-            -- Use Rayfield V2 Refresh method
-            local success, error = pcall(function()
-                GPSLocationDropdown:Refresh(locations)
-            end)
+        if locations and #locations > 0 then
+            -- Set first location immediately
+            selectedGPSLocation = locations[1]
             
-            if success then
-                selectedGPSLocation = locations[1]
-                print("✅ Dropdown refreshed successfully with", #locations, "locations")
-                message("📂 Category: " .. Option .. " (" .. #locations .. " locations)", 2)
+            if GPSLocationDropdown then
+                -- Try multiple refresh approaches for better compatibility
+                local refreshSuccess = false
+                
+                -- Method 1: Rayfield V2 Refresh
+                local success1, error1 = pcall(function()
+                    GPSLocationDropdown:Refresh(locations)
+                    refreshSuccess = true
+                end)
+                
+                if success1 then
+                    print("✅ Method 1: Dropdown refreshed successfully with", #locations, "locations")
+                    message("📂 Category: " .. Option .. " (" .. #locations .. " locations)", 2)
+                else
+                    print("⚠️ Method 1 failed:", error1)
+                    
+                    -- Method 2: Force update with alternatives
+                    local success2, error2 = pcall(function()
+                        -- Try updating options directly
+                        if GPSLocationDropdown.Options then
+                            GPSLocationDropdown.Options = locations
+                            refreshSuccess = true
+                        end
+                    end)
+                    
+                    if success2 then
+                        print("✅ Method 2: Options updated successfully")
+                        message("📂 Category: " .. Option .. " (" .. #locations .. " locations)", 2)
+                    else
+                        print("⚠️ Method 2 also failed:", error2)
+                        
+                        -- Method 3: Force delayed refresh
+                        spawn(function()
+                            wait(0.5)
+                            local success3, error3 = pcall(function()
+                                GPSLocationDropdown:Refresh(locations)
+                            end)
+                            if success3 then
+                                message("✅ Delayed refresh successful for " .. Option, 2)
+                            else
+                                message("⚠️ Use 🔄 Refresh GPS Locations button to update", 3)
+                            end
+                        end)
+                    end
+                end
             else
-                print("⚠️ Refresh method failed:", error)
-                message("⚠️ Failed to update locations for category: " .. Option, 2)
+                print("❌ GPSLocationDropdown is nil")
+                message("⚠️ GPS Location dropdown not ready. Use refresh button.", 3)
             end
         else
-            if not GPSLocationDropdown then
-                print("❌ GPSLocationDropdown is nil")
-            else
-                print("❌ No locations found for category:", Option)
-                message("📂 Category: " .. Option .. " (No locations found)", 2)
-            end
+            print("❌ No locations found for category:", Option)
+            message("📂 Category: " .. Option .. " (No locations found)", 2)
         end
     end,
 })
@@ -579,6 +617,87 @@ GPSLocationDropdown = TeleportsTab:CreateDropdown({
                 break
             end
         end
+    end,
+})
+
+-- Add manual refresh button for GPS locations
+local RefreshGPSButton = TeleportsTab:CreateButton({
+    Name = "🔄 Refresh GPS Locations",
+    Callback = function()
+        print("🔄 Manual GPS refresh triggered for category:", selectedGPSCategory)
+        
+        -- Get fresh locations for current category
+        local locations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
+        print("📍 Found", #locations, "locations for refresh")
+        
+        if locations and #locations > 0 then
+            -- Try multiple refresh methods
+            local refreshSuccess = false
+            
+            -- Method 1: Try Rayfield V2 Refresh
+            local success1, error1 = pcall(function()
+                GPSLocationDropdown:Refresh(locations)
+                refreshSuccess = true
+            end)
+            
+            if not success1 then
+                print("⚠️ Method 1 failed:", error1)
+                
+                -- Method 2: Try alternative refresh
+                local success2, error2 = pcall(function()
+                    if GPSLocationDropdown.Options then
+                        GPSLocationDropdown.Options = locations
+                        refreshSuccess = true
+                    end
+                end)
+                
+                if not success2 then
+                    print("⚠️ Method 2 failed:", error2)
+                end
+            end
+            
+            if refreshSuccess then
+                selectedGPSLocation = locations[1]
+                message("✅ GPS Locations refreshed!\n📂 Category: " .. selectedGPSCategory .. "\n📍 Found " .. #locations .. " locations", 3)
+            else
+                message("⚠️ Failed to refresh GPS locations. Try selecting category again.", 3)
+            end
+        else
+            message("❌ No locations found for category: " .. selectedGPSCategory, 3)
+        end
+    end,
+})
+
+-- Add debug button to help troubleshoot GPS issues
+local DebugGPSButton = TeleportsTab:CreateButton({
+    Name = "🔍 Debug GPS Data",
+    Callback = function()
+        local debugMsg = "🔍 GPS Debug Information:\n\n"
+        debugMsg = debugMsg .. "📂 Current Category: " .. selectedGPSCategory .. "\n"
+        debugMsg = debugMsg .. "📍 Current Location: " .. (selectedGPSLocation or "None") .. "\n\n"
+        
+        -- Get all categories
+        local categories = TeleportSystemV2.getCategoryNames()
+        debugMsg = debugMsg .. "📋 Available Categories (" .. #categories .. "):\n"
+        for i, cat in pairs(categories) do
+            local locations = TeleportSystemV2.getLocationNames(cat)
+            debugMsg = debugMsg .. i .. ". " .. cat .. " (" .. #locations .. " locations)\n"
+        end
+        
+        -- Get locations for current category
+        local currentLocations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
+        debugMsg = debugMsg .. "\n📍 Locations in " .. selectedGPSCategory .. " (" .. #currentLocations .. "):\n"
+        
+        for i, loc in pairs(currentLocations) do
+            if i <= 5 then -- Show first 5 locations
+                debugMsg = debugMsg .. i .. ". " .. loc .. "\n"
+            elseif i == 6 then
+                debugMsg = debugMsg .. "... and " .. (#currentLocations - 5) .. " more\n"
+                break
+            end
+        end
+        
+        message(debugMsg, 10)
     end,
 })
 
