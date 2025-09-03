@@ -676,7 +676,10 @@ local RefreshGPSButton = TeleportsTab:CreateButton({
                     end
                 end)
                 
-                if not success1 then
+                if success1 then
+                    print("✅ Method 1: Refresh successful")
+                    message("✅ GPS Locations refreshed!\n📂 Category: " .. selectedGPSCategory .. "\n📍 Found " .. #locations .. " locations", 3)
+                else
                     print("⚠️ Method 1 failed:", tostring(error1))
                     
                     -- Method 2: Try alternative refresh
@@ -689,7 +692,10 @@ local RefreshGPSButton = TeleportsTab:CreateButton({
                         end
                     end)
                     
-                    if not success2 then
+                    if success2 then
+                        print("✅ Method 2: Options updated successfully")
+                        message("✅ GPS Locations refreshed!\n📂 Category: " .. selectedGPSCategory .. "\n📍 Found " .. #locations .. " locations", 3)
+                    else
                         print("⚠️ Method 2 failed:", tostring(error2))
                         
                         -- Method 3: Try delayed refresh
@@ -710,10 +716,7 @@ local RefreshGPSButton = TeleportsTab:CreateButton({
                     end
                 end
                 
-                if refreshSuccess then
-                    selectedGPSLocation = locations[1]
-                    message("✅ GPS Locations refreshed!\n📂 Category: " .. selectedGPSCategory .. "\n📍 Found " .. #locations .. " locations", 3)
-                else
+                if not refreshSuccess then
                     message("⚠️ Failed to refresh GPS locations. Try selecting category again.", 3)
                 end
             else
