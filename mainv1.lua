@@ -149,6 +149,77 @@ FindRod = function()
         return nil
     end
 end
+
+-- AI Player Detection System
+DetectNearbyPlayers = function()
+    if not playerDetectionEnabled then
+        return false, {}
+    end
+    
+    local currentTime = tick()
+    if currentTime - lastDetectionCheck < detectionInterval then
+        return #nearbyPlayers > 0, nearbyPlayers
+    end
+    
+    lastDetectionCheck = currentTime
+    nearbyPlayers = {}
+    
+    local myPosition = gethrp().Position
+    
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= lp and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local playerPosition = player.Character.HumanoidRootPart.Position
+            local distance = (myPosition - playerPosition).Magnitude
+            
+            if distance <= detectionRadius then
+                table.insert(nearbyPlayers, {
+                    player = player,
+                    distance = distance,
+                    position = playerPosition
+                })
+            end
+        end
+    end
+    
+    return #nearbyPlayers > 0, nearbyPlayers
+end
+
+GetAdjustedDelay = function(baseDelay)
+    local hasNearbyPlayers, players = DetectNearbyPlayers()
+    if hasNearbyPlayers then
+        -- Find closest player for additional caution
+        local closestDistance = math.huge
+        local closestPlayerName = ""
+        for _, playerData in pairs(players) do
+            if playerData.distance < closestDistance then
+                closestDistance = playerData.distance
+                closestPlayerName = playerData.player.Name
+            end
+        end
+        
+        -- More aggressive delay multiplier for very close players
+        local proximityMultiplier = 1
+        local statusIcon = ""
+        if closestDistance <= 2 then
+            proximityMultiplier = 5.0 -- Very close = extra slow
+            statusIcon = "🔴"
+        elseif closestDistance <= 5 then
+            proximityMultiplier = 3.0 -- Close = slow  
+            statusIcon = "🟡"
+        else
+            proximityMultiplier = slowModeMultiplier -- Normal nearby = moderate slow
+            statusIcon = "🟠"
+        end
+        
+        -- Optional: Show warning message for very close players (can be toggled)
+        if closestDistance <= 2 and math.random(1, 100) <= 5 then -- 5% chance to show warning
+            message(statusIcon .. " CAUTION: " .. closestPlayerName .. " very close (" .. math.floor(closestDistance) .. "m)", 1)
+        end
+        
+        return baseDelay * proximityMultiplier
+    end
+    return baseDelay
+end
 message = function(text, time)
     if tooltipmessage then tooltipmessage:Remove() end
     tooltipmessage = require(lp.PlayerGui:WaitForChild("GeneralUIModule")):GiveToolTip(lp, text)
@@ -338,6 +409,14 @@ local autoReelDelay = 0.5
 local perfectCastDelay = 0.1
 local alwaysCatchDelay = 0.1
 
+-- AI Player Detection System
+local playerDetectionEnabled = false
+local detectionRadius = 15 -- meters
+local slowModeMultiplier = 3.0 -- delay multiplier when players nearby
+local nearbyPlayers = {}
+local lastDetectionCheck = 0
+local detectionInterval = 1 -- check every 1 second
+
 local contentSuccess, contentError = pcall(function()
 
 --// Automation Tab
@@ -496,6 +575,75 @@ local ResetDelayButton = AutomationTab:CreateButton({
         AlwaysCatchDelaySlider:Set(alwaysCatchDelay)
         
         message("🔄 All delays reset to default values!", 2)
+    end,
+})
+
+--// AI Player Detection Section
+AutomationTab:CreateSection("🤖 AI Player Detection")
+
+local PlayerDetectionToggle = AutomationTab:CreateToggle({
+    Name = "Smart Player Detection",
+    CurrentValue = false,
+    Flag = "playerdetection",
+    Callback = function(Value)
+        playerDetectionEnabled = Value
+        if Value then
+            message("🤖 AI Player Detection: ENABLED", 2)
+        else
+            message("🤖 AI Player Detection: DISABLED", 2)
+            nearbyPlayers = {} -- Clear detection cache
+        end
+    end,
+})
+
+local DetectionRadiusSlider = AutomationTab:CreateSlider({
+    Name = "Detection Radius (meters)",
+    Range = {5, 50},
+    Increment = 1,
+    Suffix = "m",
+    CurrentValue = detectionRadius,
+    Flag = "detectionradius",
+    Callback = function(Value)
+        detectionRadius = Value
+        message("🎯 Detection Radius: " .. Value .. "m", 1)
+    end,
+})
+
+local SlowModeMultiplierSlider = AutomationTab:CreateSlider({
+    Name = "Slow Mode Multiplier",
+    Range = {1.5, 10.0},
+    Increment = 0.5,
+    Suffix = "x",
+    CurrentValue = slowModeMultiplier,
+    Flag = "slowmodemultiplier",
+    Callback = function(Value)
+        slowModeMultiplier = Value
+        message("🐌 Slow Mode: " .. Value .. "x slower", 1)
+    end,
+})
+
+local PlayerStatusButton = AutomationTab:CreateButton({
+    Name = "📊 Check Nearby Players",
+    Callback = function()
+        if not playerDetectionEnabled then
+            message("❌ Player Detection is disabled!", 2)
+            return
+        end
+        
+        local hasNearby, players = DetectNearbyPlayers()
+        if hasNearby then
+            local statusText = "👥 Found " .. #players .. " nearby players:\n"
+            for i, playerData in pairs(players) do
+                statusText = statusText .. "• " .. playerData.player.Name .. " (" .. math.floor(playerData.distance) .. "m)\n"
+                if i >= 3 then -- Limit to 3 players in message
+                    statusText = statusText .. "• And " .. (#players - 3) .. " more..."
+                    break
+                end
+            end
+            message(statusText, 4)
+        else
+            message("✅ No players detected within " .. detectionRadius .. "m radius", 2)
+        end
     end,
 })
 
@@ -1589,7 +1737,8 @@ RunService.Heartbeat:Connect(function()
         if FindChild(lp.PlayerGui, 'shakeui') and FindChild(lp.PlayerGui['shakeui'], 'safezone') and FindChild(lp.PlayerGui['shakeui']['safezone'], 'button') then
             GuiService.SelectedObject = lp.PlayerGui['shakeui']['safezone']['button']
             if GuiService.SelectedObject == lp.PlayerGui['shakeui']['safezone']['button'] then
-                task.wait(autoShakeDelay)
+                local adjustedDelay = GetAdjustedDelay(autoShakeDelay)
+                task.wait(adjustedDelay)
                 game:GetService('VirtualInputManager'):SendKeyEvent(true, Enum.KeyCode.Return, false, game)
                 game:GetService('VirtualInputManager'):SendKeyEvent(false, Enum.KeyCode.Return, false, game)
             end
@@ -1598,15 +1747,21 @@ RunService.Heartbeat:Connect(function()
     
     if autoCastEnabled then
         local rod = FindRod()
-        if rod ~= nil and rod['values']['lure'].Value <= .001 and task.wait(autoCastDelay) then
-            rod.events.cast:FireServer(100, 1)
+        if rod ~= nil and rod['values']['lure'].Value <= .001 then
+            local adjustedDelay = GetAdjustedDelay(autoCastDelay)
+            if task.wait(adjustedDelay) then
+                rod.events.cast:FireServer(100, 1)
+            end
         end
     end
     
     if autoReelEnabled then
         local rod = FindRod()
-        if rod ~= nil and rod['values']['lure'].Value == 100 and task.wait(autoReelDelay) then
-            ReplicatedStorage.events.reelfinished:FireServer(100, true)
+        if rod ~= nil and rod['values']['lure'].Value == 100 then
+            local adjustedDelay = GetAdjustedDelay(autoReelDelay)
+            if task.wait(adjustedDelay) then
+                ReplicatedStorage.events.reelfinished:FireServer(100, true)
+            end
         end
     end
 
