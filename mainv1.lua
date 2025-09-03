@@ -462,36 +462,67 @@ local GPSCategoryDropdown = TeleportsTab:CreateDropdown({
         selectedGPSCategory = Option
         
         -- Update GPS locations for selected category
-        if TeleportSystemV2 and TeleportSystemV2.getLocationNames then
-            local locations = TeleportSystemV2.getLocationNames(Option)
-            selectedGPSLocation = locations[1] or ""
+        if TeleportSystemV2 then
+            -- Debug: Check what function is available
+            print("🔍 Checking TeleportSystemV2 functions:")
+            print("getLocationNames:", type(TeleportSystemV2.getLocationNames))
+            print("getLocationsByCategory:", type(TeleportSystemV2.getLocationsByCategory))
             
-            -- Try to update GPS Location dropdown
-            if GPSLocationDropdown then
-                task.spawn(function()
-                    task.wait(0.1) -- Small delay to ensure dropdown is ready
-                    local success = pcall(function()
-                        -- Try Rayfield refresh method
-                        if GPSLocationDropdown.Refresh then
-                            GPSLocationDropdown:Refresh(locations)
-                        elseif GPSLocationDropdown.UpdateOptions then
-                            GPSLocationDropdown:UpdateOptions(locations)
-                        else
-                            -- Fallback: try to set options directly
-                            GPSLocationDropdown.Options = locations
-                        end
-                    end)
-                    
-                    if success then
-                        print("✅ GPS Location dropdown updated successfully")
-                    else
-                        print("⚠️ Could not auto-update dropdown, use Refresh button")
+            local locations = {}
+            
+            -- Try different methods to get locations
+            if TeleportSystemV2.getLocationNames then
+                locations = TeleportSystemV2.getLocationNames(Option)
+                print("📍 getLocationNames returned:", #locations, "locations")
+            elseif TeleportSystemV2.getLocationsByCategory then
+                local locationData = TeleportSystemV2.getLocationsByCategory(Option)
+                print("📍 getLocationsByCategory returned:", #locationData, "location objects")
+                
+                -- Extract location names from location objects
+                for _, loc in pairs(locationData) do
+                    if loc.name then
+                        table.insert(locations, loc.name)
                     end
-                end)
+                end
+                print("📍 Extracted", #locations, "location names")
+            else
+                print("❌ No location retrieval function found")
             end
             
-            message("📂 Category: " .. Option .. " (" .. #locations .. " locations)", 2)
-            print("📍 Found", #locations, "locations for category:", Option)
+            if #locations > 0 then
+                selectedGPSLocation = locations[1]
+                
+                -- Try to update GPS Location dropdown
+                if GPSLocationDropdown then
+                    task.spawn(function()
+                        task.wait(0.1)
+                        local success, err = pcall(function()
+                            if GPSLocationDropdown.Refresh then
+                                GPSLocationDropdown:Refresh(locations)
+                                print("✅ Dropdown refreshed with Refresh method")
+                            elseif GPSLocationDropdown.UpdateOptions then
+                                GPSLocationDropdown:UpdateOptions(locations)
+                                print("✅ Dropdown updated with UpdateOptions method")
+                            else
+                                GPSLocationDropdown.Options = locations
+                                print("✅ Dropdown updated with direct Options assignment")
+                            end
+                        end)
+                        
+                        if success then
+                            print("✅ GPS Location dropdown updated successfully")
+                        else
+                            print("❌ Failed to update dropdown:", err)
+                        end
+                    end)
+                end
+                
+                message("📂 Category: " .. Option .. " (" .. #locations .. " locations)", 2)
+            else
+                selectedGPSLocation = ""
+                message("❌ No locations found for category: " .. Option, 3)
+                print("❌ No locations found for category:", Option)
+            end
         else
             message("❌ Teleport system not loaded", 3)
         end
@@ -499,9 +530,33 @@ local GPSCategoryDropdown = TeleportsTab:CreateDropdown({
 })
 
 -- Initial location names
-local initialLocations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
+local initialLocations = {}
+if TeleportSystemV2 then
+    print("🔍 Getting initial locations for category:", selectedGPSCategory)
+    
+    -- Try different methods to get initial locations
+    if TeleportSystemV2.getLocationNames then
+        initialLocations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
+        print("📍 getLocationNames returned:", #initialLocations, "initial locations")
+    elseif TeleportSystemV2.getLocationsByCategory then
+        local locationData = TeleportSystemV2.getLocationsByCategory(selectedGPSCategory)
+        print("📍 getLocationsByCategory returned:", #locationData, "initial location objects")
+        
+        for _, loc in pairs(locationData) do
+            if loc.name then
+                table.insert(initialLocations, loc.name)
+            end
+        end
+        print("📍 Extracted", #initialLocations, "initial location names")
+    end
+end
+
 if #initialLocations > 0 then
     selectedGPSLocation = initialLocations[1]
+    print("📍 Set initial GPS location to:", selectedGPSLocation)
+else
+    initialLocations = {"No locations available"}
+    print("⚠️ No initial locations found, using placeholder")
 end
 
 GPSLocationDropdown = TeleportsTab:CreateDropdown({
@@ -521,32 +576,62 @@ local RefreshGPSButton = TeleportsTab:CreateButton({
     Name = "🔄 Refresh GPS Locations",
     Callback = function()
         if TeleportSystemV2 and selectedGPSCategory then
-            local locations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
-            selectedGPSLocation = locations[1] or ""
+            print("🔄 Manual refresh for category:", selectedGPSCategory)
             
-            -- Force update GPS Location dropdown
-            if GPSLocationDropdown then
-                local success = pcall(function()
-                    if GPSLocationDropdown.Refresh then
-                        GPSLocationDropdown:Refresh(locations)
-                    elseif GPSLocationDropdown.UpdateOptions then
-                        GPSLocationDropdown:UpdateOptions(locations)
-                    else
-                        GPSLocationDropdown.Options = locations
-                    end
-                end)
+            local locations = {}
+            
+            -- Try different methods to get locations
+            if TeleportSystemV2.getLocationNames then
+                locations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
+                print("📍 getLocationNames returned:", #locations, "locations")
+            elseif TeleportSystemV2.getLocationsByCategory then
+                local locationData = TeleportSystemV2.getLocationsByCategory(selectedGPSCategory)
+                print("📍 getLocationsByCategory returned:", #locationData, "location objects")
                 
-                if success then
-                    message("✅ GPS refreshed: " .. #locations .. " locations", 2)
-                    print("✅ Dropdown refreshed with", #locations, "locations")
+                for _, loc in pairs(locationData) do
+                    if loc.name then
+                        table.insert(locations, loc.name)
+                    end
+                end
+                print("📍 Extracted", #locations, "location names")
+            end
+            
+            if #locations > 0 then
+                selectedGPSLocation = locations[1]
+                
+                -- Force update GPS Location dropdown
+                if GPSLocationDropdown then
+                    local success, err = pcall(function()
+                        if GPSLocationDropdown.Refresh then
+                            GPSLocationDropdown:Refresh(locations)
+                            print("✅ Used Refresh method")
+                        elseif GPSLocationDropdown.UpdateOptions then
+                            GPSLocationDropdown:UpdateOptions(locations)
+                            print("✅ Used UpdateOptions method")
+                        else
+                            GPSLocationDropdown.Options = locations
+                            print("✅ Used direct Options assignment")
+                        end
+                    end)
+                    
+                    if success then
+                        message("✅ GPS refreshed: " .. #locations .. " locations", 2)
+                        print("✅ Dropdown refreshed successfully with", #locations, "locations")
+                    else
+                        message("❌ Refresh failed: " .. tostring(err), 3)
+                        print("❌ Dropdown refresh failed:", err)
+                    end
                 else
-                    message("⚠️ Manual refresh needed - restart script", 3)
+                    message("❌ GPS Location dropdown not found", 3)
+                    print("❌ GPSLocationDropdown is nil")
                 end
             else
-                message("❌ GPS Location dropdown not found", 3)
+                message("❌ No locations found for: " .. selectedGPSCategory, 3)
+                print("❌ No locations found for category:", selectedGPSCategory)
             end
         else
             message("❌ Cannot refresh GPS - system not loaded", 3)
+            print("❌ TeleportSystemV2 or selectedGPSCategory is nil")
         end
     end,
 })
@@ -557,14 +642,49 @@ local DebugGPSButton = TeleportsTab:CreateButton({
     Callback = function()
         if TeleportSystemV2 then
             local categories = TeleportSystemV2.getCategoryNames()
-            local currentLocations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
-            local msg = "🔍 GPS Debug:\n📂 Categories: " .. #categories .. 
-                       "\n📍 Current Category: " .. (selectedGPSCategory or "None") ..
-                       "\n📍 Locations in Category: " .. #currentLocations ..
-                       "\n📍 Selected Location: " .. (selectedGPSLocation or "None")
+            print("🔍 === GPS SYSTEM DEBUG ===")
+            print("📂 Total Categories:", #categories)
+            print("📍 Selected Category:", selectedGPSCategory or "None")
+            print("📍 Selected Location:", selectedGPSLocation or "None")
+            
+            -- Test different location retrieval methods
+            if selectedGPSCategory then
+                print("🧪 Testing location retrieval methods for:", selectedGPSCategory)
+                
+                if TeleportSystemV2.getLocationNames then
+                    local names = TeleportSystemV2.getLocationNames(selectedGPSCategory)
+                    print("   getLocationNames():", #names, "results")
+                    for i = 1, math.min(3, #names) do
+                        print("     ", i, names[i])
+                    end
+                end
+                
+                if TeleportSystemV2.getLocationsByCategory then
+                    local objects = TeleportSystemV2.getLocationsByCategory(selectedGPSCategory)
+                    print("   getLocationsByCategory():", #objects, "results")
+                    for i = 1, math.min(3, #objects) do
+                        if objects[i] and objects[i].name then
+                            print("     ", i, objects[i].name)
+                        end
+                    end
+                end
+            end
+            
+            print("� Dropdown Status:")
+            print("   GPSLocationDropdown exists:", GPSLocationDropdown ~= nil)
+            if GPSLocationDropdown then
+                print("   Has Refresh method:", GPSLocationDropdown.Refresh ~= nil)
+                print("   Has UpdateOptions method:", GPSLocationDropdown.UpdateOptions ~= nil)
+                print("   Has Options property:", GPSLocationDropdown.Options ~= nil)
+            end
+            print("🔍 === END DEBUG ===")
+            
+            local msg = "� GPS Debug Complete\nCheck console for details\n📂 Categories: " .. #categories .. 
+                       "\n📍 Current: " .. (selectedGPSCategory or "None")
             message(msg, 8)
         else
             message("❌ TeleportSystemV2 not loaded", 3)
+            print("❌ TeleportSystemV2 is nil")
         end
     end,
 })
