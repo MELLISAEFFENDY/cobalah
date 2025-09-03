@@ -36,6 +36,36 @@ end
 
 print("🔧 Helper functions loaded successfully!")
 
+--// Error Suppression for UI Library
+local originalError = error
+local originalWarn = warn
+
+-- Suppress specific InputObject errors from Rayfield
+warn = function(message, ...)
+    if typeof(message) == "string" and (
+        string.find(message, "Target is not a valid member of InputObject") or
+        string.find(message, "InputObject") or
+        string.find(message, "UserInputService")
+    ) then
+        -- Suppress these specific warnings
+        return
+    end
+    return originalWarn(message, ...)
+end
+
+error = function(message, ...)
+    if typeof(message) == "string" and (
+        string.find(message, "Target is not a valid member of InputObject") or
+        string.find(message, "InputObject")
+    ) then
+        -- Convert error to warning for these specific cases
+        return originalWarn(message, ...)
+    end
+    return originalError(message, ...)
+end
+
+print("🔇 Error suppression for UI library activated!")
+
 --// Load Teleport System V2 from GitHub
 print("📡 Loading Teleport System V2 from GitHub...")
 local TeleportSystemV2
@@ -131,20 +161,42 @@ end
 --// Load Rayfield UI from GitHub
 print("🎨 Loading Rayfield UI from GitHub...")
 local Rayfield
-local rayfieldURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/rayfield.lua"
+local rayfieldURL = "https://sirius.menu/rayfield" -- Using more stable Rayfield version
 
--- Load from GitHub only
+-- Load from GitHub with error suppression
 local success, result = pcall(function()
-    return loadstring(game:HttpGet(rayfieldURL))()
+    -- Suppress Rayfield errors temporarily
+    local oldWarn = warn
+    local oldError = error
+    warn = function(...) end
+    error = function(...) end
+    
+    local rayfield = loadstring(game:HttpGet(rayfieldURL))()
+    
+    -- Restore original functions
+    warn = oldWarn
+    error = oldError
+    
+    return rayfield
 end)
 
 if success and result then
     Rayfield = result
-    print("✅ Rayfield UI loaded from GitHub successfully!")
+    print("✅ Rayfield UI loaded from stable source successfully!")
 else
-    print("❌ Failed to load Rayfield UI from GitHub. Error: " .. tostring(result))
-    print("❌ CRITICAL ERROR: Cannot continue without Rayfield UI!")
-    return -- Exit script if Rayfield cannot load
+    print("❌ Failed to load Rayfield UI from stable source. Trying backup...")
+    -- Fallback to original source
+    local success2, result2 = pcall(function()
+        return loadstring(game:HttpGet("https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/rayfield.lua"))()
+    end)
+    
+    if success2 and result2 then
+        Rayfield = result2
+        print("✅ Rayfield UI loaded from backup successfully!")
+    else
+        print("❌ CRITICAL ERROR: Cannot load Rayfield UI from any source!")
+        return
+    end
 end
 
 --// Load Advanced Inventory Exploits from GitHub
@@ -1342,3 +1394,9 @@ print("   📦 Inventory & Item Management")
 print("   💰 Economy & Marketplace Tools")
 print("🎮 UI should be visible now! Check your screen.")
 print("⚡ Ready to use - Enjoy fishing! ⚡")
+
+--// Restore original error functions after UI is loaded
+print("🔊 Restoring original error functions...")
+warn = originalWarn
+error = originalError
+print("✅ Error functions restored!")
