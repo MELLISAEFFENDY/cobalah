@@ -158,33 +158,45 @@ message = function(text, time)
     end)
 end
 
---// Load Local Rayfield UI
-print("🎨 Loading Local Rayfield UI...")
+--// Load Local Rayfield UI V2 (Full Source)
+print("🎨 Loading Local Rayfield UI V2 (Full Source)...")
 local Rayfield
 
--- Load from local file
+-- Load from local file rayfieldv2.lua (full source from sirius.menu/rayfield)
 local success, result = pcall(function()
-    print("📁 Loading from local rayfield.lua file...")
-    return loadstring(readfile("rayfield.lua"))()
+    print("📁 Loading from local rayfieldv2.lua file (full source)...")
+    return loadstring(readfile("rayfieldv2.lua"))()
 end)
 
 if success and result then
     Rayfield = result
-    print("✅ Local Rayfield UI loaded successfully!")
+    print("✅ Local Rayfield UI V2 (Full Source) loaded successfully!")
 else
-    print("❌ Failed to load local Rayfield UI. Error:", result)
-    print("📦 Trying fallback from GitHub...")
+    print("❌ Failed to load local Rayfield V2. Error:", result)
+    print("📦 Trying fallback to simple rayfield.lua...")
     
-    -- Fallback to GitHub
+    -- First fallback to simple rayfield.lua
     local success2, result2 = pcall(function()
-        return loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+        return loadstring(readfile("rayfield.lua"))()
     end)
     
     if success2 and result2 then
         Rayfield = result2
-        print("✅ Rayfield UI loaded from GitHub fallback!")
+        print("✅ Rayfield UI loaded from simple rayfield.lua fallback!")
     else
-        error("❌ Cannot load Rayfield UI from any source!")
+        print("📦 Trying final fallback from GitHub...")
+        
+        -- Final fallback to GitHub
+        local success3, result3 = pcall(function()
+            return loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+        end)
+        
+        if success3 and result3 then
+            Rayfield = result3
+            print("✅ Rayfield UI loaded from GitHub fallback!")
+        else
+            error("❌ Cannot load Rayfield UI from any source!")
+        end
     end
 end
 
