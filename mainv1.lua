@@ -387,6 +387,50 @@ print("📂 Total categories:", TeleportSystemV2.getStatistics().totalCategories
 local RodColors = {}
 local RodMaterials = {}
 
+-- Initialize teleport variables
+local selectedZone = "Moosewood"
+local selectedRod = "Training Rod"
+
+-- Zone and Rod definitions for legacy teleport system
+local ZoneNames = {
+    "Moosewood", "Roslit Bay", "Terrapin Island", "Mushgrove Swamp", 
+    "Snowcap Island", "Sunstone Island", "Ancient Isle", "Forsaken Shores"
+}
+
+local RodNames = {
+    "Training Rod", "Long Rod", "Magnet Rod", "Fortune Rod", "Scurvy Rod",
+    "Stone Rod", "Depthseeker Rod", "Champions Rod", "Tempest Rod", 
+    "Poseidon Rod", "Zeus Rod", "Kraken Rod"
+}
+
+-- Legacy teleport locations for backward compatibility
+local TeleportLocations = {
+    ['Zones'] = {
+        ['Moosewood'] = CFrame.new(379.875458, 134.500519, 233.5495),
+        ['Roslit Bay'] = CFrame.new(-1472.9812, 132.525513, 707.644531),
+        ['Terrapin Island'] = CFrame.new(-193.434143, 135.121979, 1951.46936),
+        ['Mushgrove Swamp'] = CFrame.new(2434.29785, 131.983276, -691.930542),
+        ['Snowcap Island'] = CFrame.new(2607.93018, 135.284332, 2436.13208),
+        ['Sunstone Island'] = CFrame.new(-913.809143, 138.160782, -1133.25879),
+        ['Ancient Isle'] = CFrame.new(6056.02783, 195.280167, 276.270325),
+        ['Forsaken Shores'] = CFrame.new(-2491.104, 133.250015, 1561.2926)
+    },
+    ['Rods'] = {
+        ['Training Rod'] = CFrame.new(465, 150, 235),
+        ['Long Rod'] = CFrame.new(480, 180, 150),
+        ['Magnet Rod'] = CFrame.new(-200, 130, 1930),
+        ['Fortune Rod'] = CFrame.new(-1515, 141, 765),
+        ['Scurvy Rod'] = CFrame.new(-2830, 215, 1510),
+        ['Stone Rod'] = CFrame.new(5487, 143, -316),
+        ['Depthseeker Rod'] = CFrame.new(-4465, -604, 1874),
+        ['Champions Rod'] = CFrame.new(-4277, -606, 1838),
+        ['Tempest Rod'] = CFrame.new(-4928, -595, 1857),
+        ['Poseidon Rod'] = CFrame.new(-4086, -559, 895),
+        ['Zeus Rod'] = CFrame.new(-4272, -629, 2665),
+        ['Kraken Rod'] = CFrame.new(-4415, -997, 2055)
+    }
+}
+
 --// Custom Functions
 getchar = function()
     return lp.Character or lp.CharacterAdded:Wait()
