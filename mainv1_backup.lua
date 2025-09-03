@@ -4,18 +4,12 @@ local ReplicatedStorage = cloneref(game:GetService('ReplicatedStorage'))
 local RunService = cloneref(game:GetService('RunService'))
 local GuiService = cloneref(game:GetService('GuiService'))
 
-print("🔥 Fisch Cheat Hub v2 - Starting Load Process...")
-print("📍 Script Location: GitHub Raw URL")
-print("⏰ Loading Time: " .. os.date("%H:%M:%S"))
-
 --// Variables
 local lp = Players.LocalPlayer
 local fishabundancevisible = false
 local deathcon
 local tooltipmessage
 local characterposition
-
-print("✅ Variables initialized successfully!")
 
 --// Functions (moved up to fix scope issues)
 FindChildOfClass = function(parent, classname)
@@ -34,10 +28,7 @@ CheckFunc = function(func)
     return typeof(func) == 'function'
 end
 
-print("🔧 Helper functions loaded successfully!")
-
 --// Load Teleport System V2 from GitHub
-print("📡 Loading Teleport System V2 from GitHub...")
 local TeleportSystemV2
 local teleportURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/teleport-v2.lua"
 
@@ -50,15 +41,11 @@ if success and result then
     TeleportSystemV2 = result
     print("✅ Teleport System V2 loaded from GitHub successfully!")
 else
-    print("❌ Failed to load Teleport System V2 from GitHub. Error: " .. tostring(result))
-    print("⚠️ Continuing without Advanced Teleport features...")
-    TeleportSystemV2 = nil
+    error("❌ Failed to load Teleport System V2 from GitHub. Error: " .. tostring(result))
 end
 
--- Initialize the teleport system only if loaded successfully
-if TeleportSystemV2 then
-    TeleportSystemV2 = TeleportSystemV2.init()
-end
+-- Initialize the teleport system
+TeleportSystemV2 = TeleportSystemV2.init()
 
 -- Legacy teleport locations for backward compatibility
 local TeleportLocations = {
@@ -129,7 +116,6 @@ message = function(text, time)
 end
 
 --// Load Rayfield UI from GitHub
-print("🎨 Loading Rayfield UI from GitHub...")
 local Rayfield
 local rayfieldURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/rayfield.lua"
 
@@ -142,87 +128,51 @@ if success and result then
     Rayfield = result
     print("✅ Rayfield UI loaded from GitHub successfully!")
 else
-    print("❌ Failed to load Rayfield UI from GitHub. Error: " .. tostring(result))
-    print("❌ CRITICAL ERROR: Cannot continue without Rayfield UI!")
-    return -- Exit script if Rayfield cannot load
+    error("❌ Failed to load Rayfield UI from GitHub. Error: " .. tostring(result))
 end
 
 --// Load Advanced Inventory Exploits from GitHub
-print("📦 Loading Advanced Inventory Exploits from GitHub...")
 local InventoryExploits
 local inventoryURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/advanced_inventory_exploits.lua"
 
 -- Load from GitHub only
 local success2, result2 = pcall(function()
-    local code = game:HttpGet(inventoryURL)
-    print("📄 Inventory code length:", #code, "characters")
-    return loadstring(code)()
+    return loadstring(game:HttpGet(inventoryURL))()
 end)
 
 if success2 and result2 then
     InventoryExploits = result2
-    print("📦 Inventory module type:", typeof(InventoryExploits))
-    if InventoryExploits and typeof(InventoryExploits) == "table" then
-        if InventoryExploits.Initialize then
-            local initSuccess, initError = pcall(function()
-                InventoryExploits:Initialize()
-            end)
-            if initSuccess then
-                print("✅ Advanced Inventory Exploits loaded from GitHub successfully!")
-            else
-                print("⚠️ Inventory Exploits loaded but failed to initialize:", initError)
-                print("⚠️ Will continue with limited inventory features...")
-                -- Don't set to nil, keep the module but with limited functionality
-            end
+    if InventoryExploits and typeof(InventoryExploits) == "table" and InventoryExploits.Initialize then
+        local initSuccess, initError = pcall(function()
+            InventoryExploits:Initialize()
+        end)
+        if initSuccess then
+            print("✅ Advanced Inventory Exploits loaded from GitHub successfully!")
         else
-            print("⚠️ Inventory module loaded but missing Initialize function")
+            print("⚠️ Inventory Exploits loaded but failed to initialize:", initError)
+            InventoryExploits = nil
         end
     else
         print("⚠️ Inventory Exploits loaded but is not a valid module")
-        print("⚠️ Module type:", typeof(InventoryExploits))
         InventoryExploits = nil
     end
 else
-    print("❌ Failed to load Advanced Inventory Exploits from GitHub. Error: " .. tostring(result2))
-    print("⚠️ Continuing without Advanced Inventory features...")
-    InventoryExploits = nil
+    error("❌ Failed to load Advanced Inventory Exploits from GitHub. Error: " .. tostring(result2))
 end
 
 --// Load Economy & Marketplace Exploits from GitHub
-print("💰 Loading Economy & Marketplace Exploits from GitHub...")
 local EconomyExploits
 local economyURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/economy_marketplace_exploits.lua"
 
 -- Try to load from GitHub first, fallback gracefully
 local success3, result3 = pcall(function()
-    local code = game:HttpGet(economyURL)
-    print("📄 Economy code length:", #code, "characters")
-    return loadstring(code)()
+    return loadstring(game:HttpGet(economyURL))()
 end)
 
 if success3 and result3 then
     EconomyExploits = result3
-    print("💰 Economy module type:", typeof(EconomyExploits))
-    if EconomyExploits and typeof(EconomyExploits) == "table" then
-        if EconomyExploits.Initialize then
-            local initSuccess, initError = pcall(function()
-                EconomyExploits:Initialize()
-            end)
-            if initSuccess then
-                print("✅ Economy & Marketplace Exploits loaded from GitHub successfully!")
-            else
-                print("⚠️ Economy Exploits loaded but failed to initialize:", initError)
-                print("⚠️ Will continue with limited economy features...")
-                -- Don't set to nil, keep the module but with limited functionality
-            end
-        else
-            print("⚠️ Economy module loaded but missing Initialize function")
-        end
-    else
-        print("⚠️ Economy Exploits loaded but is not a valid module")
-        print("⚠️ Module type:", typeof(EconomyExploits))
-        EconomyExploits = nil
-    end
+    EconomyExploits:Initialize()
+    print("✅ Economy & Marketplace Exploits loaded from GitHub successfully!")
 else
     print("⚠️ Failed to load Economy Exploits from GitHub")
     print("⚠️ Error:", result3 or "Unknown error")
@@ -231,48 +181,19 @@ else
 end
 
 --// Create UI
-print("🚀 Creating Rayfield UI Window...")
-local windowSuccess, Window = pcall(function()
-    return Rayfield:CreateWindow({
-        Name = "Fisch Cheat Hub v2",
-        LoadingTitle = "Fisch Advanced Exploits Loading...",
-        LoadingSubtitle = "by YourName - Now with Inventory System",
-    })
-end)
-
-if windowSuccess and Window then
-    print("✅ UI Window created successfully!")
-else
-    print("❌ Failed to create UI Window:", tostring(Window))
-    return
-end
+local Window = Rayfield:CreateWindow({
+    Name = "Fisch Cheat Hub v2",
+    LoadingTitle = "Fisch Advanced Exploits Loading...",
+    LoadingSubtitle = "by YourName - Now with Inventory System",
+})
 
 --// Create Tabs
-print("📂 Creating UI Tabs...")
-local AutomationTab, ModificationsTab, TeleportsTab, VisualsTab, InventoryTab, EconomyTab
-
-local tabSuccess, tabError = pcall(function()
-    AutomationTab = Window:CreateTab({Name = "Automation"})
-    ModificationsTab = Window:CreateTab({Name = "Modifications"})
-    TeleportsTab = Window:CreateTab({Name = "Teleports"})
-    VisualsTab = Window:CreateTab({Name = "Visuals"})
-    InventoryTab = Window:CreateTab({Name = "Inventory"})
-    EconomyTab = Window:CreateTab({Name = "Economy"})
-end)
-
-if tabSuccess then
-    print("✅ UI Tabs created successfully!")
-else
-    print("❌ Failed to create UI Tabs:", tostring(tabError))
-    return
-end
-
-print("✅ All tabs created successfully!")
-
---// Create UI Content with Error Handling
-print("🎨 Creating UI Content...")
-
-local contentSuccess, contentError = pcall(function()
+local AutomationTab = Window:CreateTab({Name = "Automation"})
+local ModificationsTab = Window:CreateTab({Name = "Modifications"})
+local TeleportsTab = Window:CreateTab({Name = "Teleports"})
+local VisualsTab = Window:CreateTab({Name = "Visuals"})
+local InventoryTab = Window:CreateTab({Name = "Inventory"})
+local EconomyTab = Window:CreateTab({Name = "Economy"})
 
 --// Automation Tab
 AutomationTab:CreateSection({Name = "Autofarm"})
@@ -1276,17 +1197,7 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
-end) -- End of UI Content Creation pcall
-
-if contentSuccess then
-    print("✅ UI Content created successfully!")
-else
-    print("❌ Failed to create UI Content:", tostring(contentError))
-    print("⚠️ UI will be visible but some features may not work")
-end
-
 --// Hooks
-print("🔗 Setting up hooks...")
 if CheckFunc(hookmetamethod) then
     local old; old = hookmetamethod(game, "__namecall", function(self, ...)
         local method, args = getnamecallmethod(), {...}
@@ -1303,17 +1214,4 @@ if CheckFunc(hookmetamethod) then
         end
         return old(self, ...)
     end)
-    print("✅ Hooks set up successfully!")
-else
-    print("⚠️ hookmetamethod not available, hooks disabled")
 end
-
-print("🎉 FISCH CHEAT HUB V2 LOADED SUCCESSFULLY! 🎉")
-print("📋 Features Available:")
-print("   🤖 Auto Fishing & Automation")
-print("   🚀 Advanced Teleport System (276+ locations)")
-print("   🎨 Visual Enhancements & Rod Chams")
-print("   📦 Inventory & Item Management")
-print("   💰 Economy & Marketplace Tools")
-print("🎮 UI should be visible now! Check your screen.")
-print("⚡ Ready to use - Enjoy fishing! ⚡")
