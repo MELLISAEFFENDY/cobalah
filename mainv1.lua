@@ -67,70 +67,325 @@ end
 print("🔇 Error suppression for UI library activated!")
 
 --// Load Teleport System V2 from GitHub
-print("📡 Loading Teleport System V2 from GitHub...")
-local TeleportSystemV2
-local teleportURL = "https://raw.githubusercontent.com/MELLISAEFFENDY/cobalah/main/teleport-v2.lua"
+print("📡 Loading Integrated Teleport System...")
 
--- Load from GitHub only
-local success, result = pcall(function()
-    return loadstring(game:HttpGet(teleportURL))()
-end)
-
-if success and result then
-    TeleportSystemV2 = result
-    print("✅ Teleport System V2 loaded from GitHub successfully!")
-else
-    print("❌ Failed to load Teleport System V2 from GitHub. Error: " .. tostring(result))
-    print("⚠️ Continuing without Advanced Teleport features...")
-    TeleportSystemV2 = nil
-end
-
--- Initialize the teleport system only if loaded successfully
-if TeleportSystemV2 then
-    TeleportSystemV2 = TeleportSystemV2.init()
-end
-
--- Legacy teleport locations for backward compatibility
-local TeleportLocations = {
-    ['Zones'] = {
-        ['Moosewood'] = CFrame.new(379.875458, 134.500519, 233.5495, -0.033920113, 8.13274355e-08, 0.999424577, 8.98441925e-08, 1, -7.83249803e-08, -0.999424577, 8.7135696e-08, -0.033920113),
-        ['Roslit Bay'] = CFrame.new(-1472.9812, 132.525513, 707.644531, -0.00177415239, 1.15743369e-07, -0.99999845, -9.25943056e-09, 1, 1.15759981e-07, 0.99999845, 9.46479251e-09, -0.00177415239),
-        ['Forsaken Shores'] = CFrame.new(-2491.104, 133.250015, 1561.2926, 0.355353981, -1.68352852e-08, -0.934731781, 4.69647858e-08, 1, -1.56367586e-10, 0.934731781, -4.38439116e-08, 0.355353981),
-        ['Sunstone Island'] = CFrame.new(-913.809143, 138.160782, -1133.25879, -0.746701241, 4.50330218e-09, 0.665159583, 2.84934609e-09, 1, -3.5716119e-09, -0.665159583, -7.71657294e-10, -0.746701241),
-        ['Statue of Sovereignty'] = CFrame.new(21.4017925, 159.014709, -1039.14233, -0.865476549, -4.38348664e-08, -0.500949502, -9.38435818e-08, 1, 7.46273798e-08, 0.500949502, 1.11599142e-07, -0.865476549),
-        ['Terrapin Island'] = CFrame.new(-193.434143, 135.121979, 1951.46936, 0.512723684, -6.94711346e-08, 0.858553708, 5.44089183e-08, 1, 4.84237539e-08, -0.858553708, 2.18849721e-08, 0.512723684),
-        ['Snowcap Island'] = CFrame.new(2607.93018, 135.284332, 2436.13208, 0.909039497, -7.49003748e-10, 0.4167099, 3.38659367e-09, 1, -5.59032465e-09, -0.4167099, 6.49305321e-09, 0.909039497),
-        ['Mushgrove Swamp'] = CFrame.new(2434.29785, 131.983276, -691.930542, -0.123090521, -7.92820209e-09, -0.992395461, -9.05862692e-08, 1, 3.2467995e-09, 0.992395461, 9.02970569e-08, -0.123090521),
-        ['Ancient Isle'] = CFrame.new(6056.02783, 195.280167, 276.270325, -0.655055285, 1.96010075e-09, 0.755580962, -1.63855578e-08, 1, -1.67997189e-08, -0.755580962, -2.33853594e-08, -0.655055285),
-        ['Northern Expedition'] = CFrame.new(-1701.02979, 187.638779, 3944.81494, 0.918493569, -8.5804345e-08, 0.395435959, 8.59132356e-08, 1, 1.74328942e-08, -0.395435959, 1.7961181e-08, 0.918493569),
-        ['Northern Summit'] = CFrame.new(19608.791, 131.420105, 5222.15283, 0.462794542, -2.64426987e-08, 0.886465549, -4.47066562e-08, 1, 5.31692343e-08, -0.886465549, -6.42373408e-08, 0.462794542),
-        ['Vertigo'] = CFrame.new(-102.40567, -513.299377, 1052.07104, -0.999989033, 5.36423439e-09, 0.00468267547, 5.85247495e-09, 1, 1.04251647e-07, -0.00468267547, 1.04277916e-07, -0.999989033),
-        ['Depths Entrance'] = CFrame.new(-15.4965982, -706.123718, 1231.43494, 0.0681341439, 1.15903154e-08, -0.997676194, 7.1017638e-08, 1, 1.64673093e-08, 0.997676194, -7.19745898e-08, 0.0681341439),
-        ['Depths'] = CFrame.new(491.758118, -706.123718, 1230.6377, 0.00879980437, 1.29271776e-08, -0.999961257, 1.95575205e-13, 1, 1.29276803e-08, 0.999961257, -1.13956629e-10, 0.00879980437),
-        ['Overgrowth Caves'] = CFrame.new(19746.2676, 416.00293, 5403.5752, 0.488031536, -3.30940715e-08, -0.87282598, -3.24267696e-11, 1, -3.79341323e-08, 0.87282598, 1.85413569e-08, 0.488031536),
-        ['Frigid Cavern'] = CFrame.new(20253.6094, 756.525818, 5772.68555, -0.781508088, 1.85673343e-08, 0.623895109, 5.92671467e-09, 1, -2.23363816e-08, -0.623895109, -1.3758414e-08, -0.781508088),
-        ['Cryogenic Canal'] = CFrame.new(19958.5176, 917.195923, 5332.59375, 0.758922458, -7.29783434e-09, 0.651180983, -4.58880756e-09, 1, 1.65551253e-08, -0.651180983, -1.55522013e-08, 0.758922458),
-        ['Glacial Grotto'] = CFrame.new(20003.0273, 1136.42798, 5555.95996, 0.983130038, -3.94455064e-08, 0.182907909, 3.45229765e-08, 1, 3.0096718e-08, -0.182907909, -2.32744615e-08, 0.983130038),
-        ["Keeper's Altar"] = CFrame.new(1297.92285, -805.292236, -284.155823, -0.99758029, 5.80044706e-08, -0.0695239156, 6.16549869e-08, 1, -5.03615105e-08, 0.0695239156, -5.45261436e-08, -0.99758029)
+-- Integrated GPS Teleport System V2 (All-in-One)
+local TeleportSystemV2 = {
+    gpsData = {
+        ["Moosewood Area"] = {
+            {name = "Moosewood Main", pos = Vector3.new(379.875458, 134.500519, 233.5495), cframe = CFrame.new(379.875458, 134.500519, 233.5495, -0.033920113, 8.13274355e-08, 0.999424577, 8.98441925e-08, 1, -7.83249803e-08, -0.999424577, 8.7135696e-08, -0.033920113)},
+            {name = "Moosewood Beach", pos = Vector3.new(385, 135, 280), cframe = CFrame.new(385, 135, 280)},
+            {name = "Moosewood Pier", pos = Vector3.new(480, 150, 295), cframe = CFrame.new(480, 150, 295)},
+            {name = "Moosewood Dock", pos = Vector3.new(400, 133, 240), cframe = CFrame.new(400, 133, 240)},
+            {name = "Moosewood Shop", pos = Vector3.new(375, 135, 225), cframe = CFrame.new(375, 135, 225)},
+            {name = "Training Rod (Moosewood)", pos = Vector3.new(465, 150, 235), cframe = CFrame.new(465, 150, 235)},
+            {name = "Long Rod (Moosewood)", pos = Vector3.new(480, 180, 150), cframe = CFrame.new(480, 180, 150)},
+            {name = "Fish Radar (Moosewood)", pos = Vector3.new(365, 135, 275), cframe = CFrame.new(365, 135, 275)},
+            {name = "Basic Diving Gear (Moosewood)", pos = Vector3.new(370, 135, 250), cframe = CFrame.new(370, 135, 250)},
+            {name = "Bait Crate (Moosewood)", pos = Vector3.new(315, 135, 335), cframe = CFrame.new(315, 135, 335)},
+            {name = "Trout Fishing Spot", pos = Vector3.new(390, 132, 345), cframe = CFrame.new(390, 132, 345)},
+            {name = "Anchovy Fishing Spot", pos = Vector3.new(130, 135, 630), cframe = CFrame.new(130, 135, 630)},
+            {name = "Yellowfin Tuna Spot", pos = Vector3.new(705, 136, 340), cframe = CFrame.new(705, 136, 340)},
+        },
+        ["Terrapin Island Area"] = {
+            {name = "Terrapin Island Main", pos = Vector3.new(-193.434143, 135.121979, 1951.46936), cframe = CFrame.new(-193.434143, 135.121979, 1951.46936, 0.512723684, -6.94711346e-08, 0.858553708, 5.44089183e-08, 1, 4.84237539e-08, -0.858553708, 2.18849721e-08, 0.512723684)},
+            {name = "Terrapin Hideaway", pos = Vector3.new(160, 125, 1970), cframe = CFrame.new(160, 125, 1970)},
+            {name = "Terrapin Cave Area", pos = Vector3.new(25, 140, 1860), cframe = CFrame.new(25, 140, 1860)},
+            {name = "Dreamers Crypt", pos = Vector3.new(140, 150, 2050), cframe = CFrame.new(140, 150, 2050)},
+            {name = "Magnet Rod (Terrapin)", pos = Vector3.new(-200, 130, 1930), cframe = CFrame.new(-200, 130, 1930)},
+            {name = "Quality Bait Crate (Terrapin)", pos = Vector3.new(-175, 145, 1935), cframe = CFrame.new(-175, 145, 1935)},
+            {name = "Tempest Totem (Terrapin)", pos = Vector3.new(35, 130, 1945), cframe = CFrame.new(35, 130, 1945)},
+            {name = "Walleye Spot", pos = Vector3.new(-225, 125, 2150), cframe = CFrame.new(-225, 125, 2150)},
+            {name = "White Bass Spot", pos = Vector3.new(-50, 130, 2025), cframe = CFrame.new(-50, 130, 2025)},
+            {name = "Redeye Bass Spot", pos = Vector3.new(-35, 125, 2285), cframe = CFrame.new(-35, 125, 2285)},
+            {name = "Chinook Salmon Spot", pos = Vector3.new(-305, 125, 1625), cframe = CFrame.new(-305, 125, 1625)},
+        },
+        ["Roslit Bay Area"] = {
+            {name = "Roslit Bay Main", pos = Vector3.new(-1472.9812, 132.525513, 707.644531), cframe = CFrame.new(-1472.9812, 132.525513, 707.644531, -0.00177415239, 1.15743369e-07, -0.99999845, -9.25943056e-09, 1, 1.15759981e-07, 0.99999845, 9.46479251e-09, -0.00177415239)},
+            {name = "Roslit Bay Pier", pos = Vector3.new(-1775, 150, 680), cframe = CFrame.new(-1775, 150, 680)},
+            {name = "Roslit Volcano", pos = Vector3.new(-1875, 165, 380), cframe = CFrame.new(-1875, 165, 380)},
+            {name = "Fortune Rod (Roslit)", pos = Vector3.new(-1515, 141, 765), cframe = CFrame.new(-1515, 141, 765)},
+            {name = "Meteor Totem (Roslit)", pos = Vector3.new(-1945, 275, 230), cframe = CFrame.new(-1945, 275, 230)},
+            {name = "Glider (Roslit)", pos = Vector3.new(-1710, 150, 740), cframe = CFrame.new(-1710, 150, 740)},
+            {name = "Bait Crate (Roslit)", pos = Vector3.new(-1465, 130, 680), cframe = CFrame.new(-1465, 130, 680)},
+            {name = "Crab Cage (Roslit)", pos = Vector3.new(-1485, 130, 640), cframe = CFrame.new(-1485, 130, 640)},
+            {name = "Perch Spot", pos = Vector3.new(-1805, 140, 595), cframe = CFrame.new(-1805, 140, 595)},
+            {name = "Blue Tang Spot", pos = Vector3.new(-1465, 125, 525), cframe = CFrame.new(-1465, 125, 525)},
+            {name = "Clownfish Spot", pos = Vector3.new(-1520, 125, 520), cframe = CFrame.new(-1520, 125, 520)},
+            {name = "Arapaima Spot", pos = Vector3.new(-1765, 140, 600), cframe = CFrame.new(-1765, 140, 600)},
+        },
+        ["Mushgrove Swamp Area"] = {
+            {name = "Mushgrove Swamp Main", pos = Vector3.new(2434.29785, 131.983276, -691.930542), cframe = CFrame.new(2434.29785, 131.983276, -691.930542, -0.123090521, -7.92820209e-09, -0.992395461, -9.05862692e-08, 1, 3.2467995e-09, 0.992395461, 9.02970569e-08, -0.123090521)},
+            {name = "Guard Tower Alligator Marsh", pos = Vector3.new(2730, 130, -825), cframe = CFrame.new(2730, 130, -825)},
+            {name = "Bowfin Area", pos = Vector3.new(2520, 125, -8157), cframe = CFrame.new(2520, 125, -8157)},
+            {name = "Catfish Area", pos = Vector3.new(2670, 130, -7102), cframe = CFrame.new(2670, 130, -7102)},
+            {name = "Smokescreen Totem (Mushgrove)", pos = Vector3.new(2790, 140, -625), cframe = CFrame.new(2790, 140, -625)},
+            {name = "Crab Cage (Mushgrove)", pos = Vector3.new(2520, 135, -895), cframe = CFrame.new(2520, 135, -895)},
+            {name = "White Perch Spot", pos = Vector3.new(2475, 125, -675), cframe = CFrame.new(2475, 125, -675)},
+            {name = "Grey Carp Spot", pos = Vector3.new(2665, 125, -815), cframe = CFrame.new(2665, 125, -815)},
+            {name = "Bowfin Spot", pos = Vector3.new(2445, 125, -795), cframe = CFrame.new(2445, 125, -795)},
+            {name = "Marsh Gar Spot", pos = Vector3.new(2520, 125, -815), cframe = CFrame.new(2520, 125, -815)},
+            {name = "Alligator Spot", pos = Vector3.new(2670, 130, -710), cframe = CFrame.new(2670, 130, -710)},
+        },
+        ["Snowcap Island Area"] = {
+            {name = "Snowcap Island Main", pos = Vector3.new(2607.93018, 135.284332, 2436.13208), cframe = CFrame.new(2607.93018, 135.284332, 2436.13208, 0.909039497, -7.49003748e-10, 0.4167099, 3.38659367e-09, 1, -5.59032465e-09, -0.4167099, 6.49305321e-09, 0.909039497)},
+            {name = "Snowcap Island Peak", pos = Vector3.new(2710, 190, 2560), cframe = CFrame.new(2710, 190, 2560)},
+            {name = "Snowcap Cave Entrance", pos = Vector3.new(2750, 135, 2505), cframe = CFrame.new(2750, 135, 2505)},
+            {name = "Snowcap Island Summit", pos = Vector3.new(2800, 280, 2565), cframe = CFrame.new(2800, 280, 2565)},
+            {name = "Snowcap Cave", pos = Vector3.new(2900, 150, 2500), cframe = CFrame.new(2900, 150, 2500)},
+            {name = "Windset Totem (Snowcap)", pos = Vector3.new(2845, 180, 2700), cframe = CFrame.new(2845, 180, 2700)},
+            {name = "Pollock Spot", pos = Vector3.new(2550, 135, 2385), cframe = CFrame.new(2550, 135, 2385)},
+            {name = "Bluegill Spot", pos = Vector3.new(3070, 130, 2600), cframe = CFrame.new(3070, 130, 2600)},
+            {name = "Arctic Char Spot", pos = Vector3.new(2350, 130, 2230), cframe = CFrame.new(2350, 130, 2230)},
+            {name = "Glacierfish Spot", pos = Vector3.new(2860, 135, 2620), cframe = CFrame.new(2860, 135, 2620)},
+        },
+        ["Sunstone Island Area"] = {
+            {name = "Sunstone Island Main", pos = Vector3.new(-913.809143, 138.160782, -1133.25879), cframe = CFrame.new(-913.809143, 138.160782, -1133.25879, -0.746701241, 4.50330218e-09, 0.665159583, 2.84934609e-09, 1, -3.5716119e-09, -0.665159583, -7.71657294e-10, -0.746701241)},
+            {name = "Sunstone Cave", pos = Vector3.new(-1215, 190, -1040), cframe = CFrame.new(-1215, 190, -1040)},
+            {name = "Upper Sunstone", pos = Vector3.new(-1045, 135, -1140), cframe = CFrame.new(-1045, 135, -1140)},
+            {name = "Sundial Totem (Sunstone)", pos = Vector3.new(-1145, 135, -1075), cframe = CFrame.new(-1145, 135, -1075)},
+            {name = "Bait Crate (Sunstone)", pos = Vector3.new(-1045, 200, -1100), cframe = CFrame.new(-1045, 200, -1100)},
+            {name = "Crab Cage (Sunstone)", pos = Vector3.new(-920, 130, -1105), cframe = CFrame.new(-920, 130, -1105)},
+            {name = "Sweetfish Spot", pos = Vector3.new(-940, 130, -1105), cframe = CFrame.new(-940, 130, -1105)},
+            {name = "Glassfish Spot", pos = Vector3.new(-905, 130, -1000), cframe = CFrame.new(-905, 130, -1000)},
+            {name = "Longtail Bass Spot", pos = Vector3.new(-860, 135, -1205), cframe = CFrame.new(-860, 135, -1205)},
+            {name = "Sunfish Spot", pos = Vector3.new(-975, 125, -1430), cframe = CFrame.new(-975, 125, -1430)},
+        },
+        ["Ancient Isle Area"] = {
+            {name = "Ancient Isle Main", pos = Vector3.new(6056.02783, 195.280167, 276.270325), cframe = CFrame.new(6056.02783, 195.280167, 276.270325, -0.655055285, 1.96010075e-09, 0.755580962, -1.63855578e-08, 1, -1.67997189e-08, -0.755580962, -2.33853594e-08, -0.655055285)},
+            {name = "Fragment Puzzle Chamber", pos = Vector3.new(5870, 160, 415), cframe = CFrame.new(5870, 160, 415)},
+            {name = "Ancient Isle Cave 1", pos = Vector3.new(5487, 143, -316), cframe = CFrame.new(5487, 143, -316)},
+            {name = "Ancient Isle Cave 2", pos = Vector3.new(5966, 274, 846), cframe = CFrame.new(5966, 274, 846)},
+            {name = "Ancient Isle Cave 3", pos = Vector3.new(6075, 195, 260), cframe = CFrame.new(6075, 195, 260)},
+            {name = "Stone Rod (Ancient)", pos = Vector3.new(5487, 143, -316), cframe = CFrame.new(5487, 143, -316)},
+            {name = "Eclipse Totem (Ancient)", pos = Vector3.new(5966, 274, 846), cframe = CFrame.new(5966, 274, 846)},
+            {name = "Anomalocaris Spot", pos = Vector3.new(5504, 143, -321), cframe = CFrame.new(5504, 143, -321)},
+            {name = "Cobia Spot", pos = Vector3.new(5983, 125, 1007), cframe = CFrame.new(5983, 125, 1007)},
+            {name = "Hallucigenia Spot", pos = Vector3.new(6015, 190, 339), cframe = CFrame.new(6015, 190, 339)},
+            {name = "Leedsichthys Spot", pos = Vector3.new(6052, 394, 648), cframe = CFrame.new(6052, 394, 648)},
+        },
+        ["Forsaken Shores Area"] = {
+            {name = "Forsaken Shores Main", pos = Vector3.new(-2491.104, 133.250015, 1561.2926), cframe = CFrame.new(-2491.104, 133.250015, 1561.2926, 0.355353981, -1.68352852e-08, -0.934731781, 4.69647858e-08, 1, -1.56367586e-10, 0.934731781, -4.38439116e-08, 0.355353981)},
+            {name = "Forsaken Shores Deep", pos = Vector3.new(-3600, 125, 1605), cframe = CFrame.new(-3600, 125, 1605)},
+            {name = "Scurvy Rod", pos = Vector3.new(-2830, 215, 1510), cframe = CFrame.new(-2830, 215, 1510)},
+            {name = "Bait Crate (Forsaken)", pos = Vector3.new(-2490, 130, 1535), cframe = CFrame.new(-2490, 130, 1535)},
+            {name = "Crab Cage (Forsaken)", pos = Vector3.new(-2525, 135, -1575), cframe = CFrame.new(-2525, 135, -1575)},
+            {name = "Scurvy Sailfish Spot", pos = Vector3.new(-2430, 130, 1450), cframe = CFrame.new(-2430, 130, 1450)},
+            {name = "Cutlass Fish Spot", pos = Vector3.new(-2645, 130, 1410), cframe = CFrame.new(-2645, 130, 1410)},
+            {name = "Shipwreck Barracuda Spot", pos = Vector3.new(-3597, 140, 1604), cframe = CFrame.new(-3597, 140, 1604)},
+            {name = "Golden Seahorse Spot", pos = Vector3.new(-3100, 127, 1450), cframe = CFrame.new(-3100, 127, 1450)},
+        },
+        ["Atlantis Deep Ocean"] = {
+            {name = "Heart of Zeus", pos = Vector3.new(-2522, 138, 1593), cframe = CFrame.new(-2522, 138, 1593)},
+            {name = "Atlantis Cave 1", pos = Vector3.new(-2551, 150, 1667), cframe = CFrame.new(-2551, 150, 1667)},
+            {name = "Atlantis Cave 2", pos = Vector3.new(-2729, 168, 1730), cframe = CFrame.new(-2729, 168, 1730)},
+            {name = "Grand Reef", pos = Vector3.new(-3576, 148, 524), cframe = CFrame.new(-3576, 148, 524)},
+            {name = "Depthseeker Rod", pos = Vector3.new(-4465, -604, 1874), cframe = CFrame.new(-4465, -604, 1874)},
+            {name = "Champions Rod", pos = Vector3.new(-4277, -606, 1838), cframe = CFrame.new(-4277, -606, 1838)},
+            {name = "Tempest Rod", pos = Vector3.new(-4928, -595, 1857), cframe = CFrame.new(-4928, -595, 1857)},
+            {name = "Poseidon Rod", pos = Vector3.new(-4086, -559, 895), cframe = CFrame.new(-4086, -559, 895)},
+            {name = "Zeus Rod", pos = Vector3.new(-4272, -629, 2665), cframe = CFrame.new(-4272, -629, 2665)},
+            {name = "Kraken Rod", pos = Vector3.new(-4415, -997, 2055), cframe = CFrame.new(-4415, -997, 2055)},
+        },
+        ["Desolate Deep Area"] = {
+            {name = "Brine Pool", pos = Vector3.new(-1710, -235, -3075), cframe = CFrame.new(-1710, -235, -3075)},
+            {name = "Reinforced Rod", pos = Vector3.new(-975, -245, -2700), cframe = CFrame.new(-975, -245, -2700)},
+            {name = "Trident Rod", pos = Vector3.new(-1485, -225, -2195), cframe = CFrame.new(-1485, -225, -2195)},
+            {name = "Tidebreaker", pos = Vector3.new(-1645, -210, -2855), cframe = CFrame.new(-1645, -210, -2855)},
+            {name = "Aurora Totem (Desolate)", pos = Vector3.new(-1800, -135, -3280), cframe = CFrame.new(-1800, -135, -3280)},
+            {name = "Phantom Ray Spot", pos = Vector3.new(-1685, -235, -3090), cframe = CFrame.new(-1685, -235, -3090)},
+            {name = "Cockatoo Squid Spot", pos = Vector3.new(-1645, -205, -2790), cframe = CFrame.new(-1645, -205, -2790)},
+            {name = "Banditfish Spot", pos = Vector3.new(-1500, -235, -2855), cframe = CFrame.new(-1500, -235, -2855)},
+        },
+        ["Vertigo Area"] = {
+            {name = "Vertigo Main", pos = Vector3.new(-102.40567, -513.299377, 1052.07104), cframe = CFrame.new(-102.40567, -513.299377, 1052.07104, -0.999989033, 5.36423439e-09, 0.00468267547, 5.85247495e-09, 1, 1.04251647e-07, -0.00468267547, 1.04277916e-07, -0.999989033)},
+            {name = "Vertigo Deep", pos = Vector3.new(-75, -530, 1285), cframe = CFrame.new(-75, -530, 1285)},
+            {name = "Vertigo Abyss", pos = Vector3.new(1210, -715, 1315), cframe = CFrame.new(1210, -715, 1315)},
+        },
+        ["The Depths Area"] = {
+            {name = "Depths Entrance", pos = Vector3.new(-15.4965982, -706.123718, 1231.43494), cframe = CFrame.new(-15.4965982, -706.123718, 1231.43494, 0.0681341439, 1.15903154e-08, -0.997676194, 7.1017638e-08, 1, 1.64673093e-08, 0.997676194, -7.19745898e-08, 0.0681341439)},
+            {name = "The Depths Main", pos = Vector3.new(491.758118, -706.123718, 1230.6377), cframe = CFrame.new(491.758118, -706.123718, 1230.6377, 0.00879980437, 1.29271776e-08, -0.999961257, 1.95575205e-13, 1, 1.29276803e-08, 0.999961257, -1.13956629e-10, 0.00879980437)},
+            {name = "Depths Abyss", pos = Vector3.new(500, -750, 1200), cframe = CFrame.new(500, -750, 1200)},
+            {name = "Depths Cave System", pos = Vector3.new(450, -720, 1250), cframe = CFrame.new(450, -720, 1250)},
+            {name = "Depths Crystal Chamber", pos = Vector3.new(520, -680, 1220), cframe = CFrame.new(520, -680, 1220)},
+        },
+        ["Northern Expedition Area"] = {
+            {name = "Northern Expedition Main", pos = Vector3.new(-1701.02979, 187.638779, 3944.81494), cframe = CFrame.new(-1701.02979, 187.638779, 3944.81494, 0.918493569, -8.5804345e-08, 0.395435959, 8.59132356e-08, 1, 1.74328942e-08, -0.395435959, 1.7961181e-08, 0.918493569)},
+            {name = "Northern Expedition Camp", pos = Vector3.new(-1680, 195, 3960), cframe = CFrame.new(-1680, 195, 3960)},
+            {name = "Northern Expedition Peak", pos = Vector3.new(-1720, 250, 3920), cframe = CFrame.new(-1720, 250, 3920)},
+            {name = "Northern Expedition Base", pos = Vector3.new(-1690, 180, 3950), cframe = CFrame.new(-1690, 180, 3950)},
+            {name = "Northern Expedition Outpost", pos = Vector3.new(-1710, 200, 3980), cframe = CFrame.new(-1710, 200, 3980)},
+        },
+        ["Northern Summit Area"] = {
+            {name = "Northern Summit Main", pos = Vector3.new(19608.791, 131.420105, 5222.15283), cframe = CFrame.new(19608.791, 131.420105, 5222.15283, 0.462794542, -2.64426987e-08, 0.886465549, -4.47066562e-08, 1, 5.31692343e-08, -0.886465549, -6.42373408e-08, 0.462794542)},
+            {name = "Northern Summit Peak", pos = Vector3.new(19650, 300, 5250), cframe = CFrame.new(19650, 300, 5250)},
+            {name = "Northern Summit Base", pos = Vector3.new(19580, 140, 5200), cframe = CFrame.new(19580, 140, 5200)},
+            {name = "Northern Summit Camp", pos = Vector3.new(19620, 160, 5230), cframe = CFrame.new(19620, 160, 5230)},
+            {name = "Northern Summit Cliff", pos = Vector3.new(19640, 200, 5240), cframe = CFrame.new(19640, 200, 5240)},
+        },
+        ["Special Rod Locations"] = {
+            {name = "Heaven Rod Location", pos = Vector3.new(20025.0508, -467.665955, 7114.40234), cframe = CFrame.new(20025.0508, -467.665955, 7114.40234, -0.9998191, -2.41349773e-10, 0.0190212391, -4.76249762e-10, 1, -1.23448247e-08, -0.0190212391, -1.23516495e-08, -0.9998191)},
+            {name = "Summit Rod Location", pos = Vector3.new(20213.334, 736.668823, 5707.8208), cframe = CFrame.new(20213.334, 736.668823, 5707.8208, -0.274440169, 3.53429606e-08, 0.961604178, -1.52819659e-08, 1, -4.11156122e-08, -0.961604178, -2.59789772e-08, -0.274440169)},
+            {name = "Kings Rod Location", pos = Vector3.new(1380.83862, -807.198608, -304.22229), cframe = CFrame.new(1380.83862, -807.198608, -304.22229, -0.692510426, 9.24755454e-08, 0.72140789, 4.86611427e-08, 1, -8.1475676e-08, -0.72140789, -2.13182219e-08, -0.692510426)},
+            {name = "Keeper's Altar", pos = Vector3.new(1297.92285, -805.292236, -284.155823), cframe = CFrame.new(1297.92285, -805.292236, -284.155823, -0.99758029, 5.80044706e-08, -0.0695239156, 6.16549869e-08, 1, -5.03615105e-08, 0.0695239156, -5.45261436e-08, -0.99758029)},
+        },
+        ["Statue of Sovereignty Area"] = {
+            {name = "Statue of Sovereignty Main", pos = Vector3.new(21.4017925, 159.014709, -1039.14233), cframe = CFrame.new(21.4017925, 159.014709, -1039.14233, -0.865476549, -4.38348664e-08, -0.500949502, -9.38435818e-08, 1, 7.46273798e-08, 0.500949502, 1.11599142e-07, -0.865476549)},
+            {name = "Statue Viewing Platform", pos = Vector3.new(50, 180, -1020), cframe = CFrame.new(50, 180, -1020)},
+            {name = "Statue Base", pos = Vector3.new(20, 150, -1040), cframe = CFrame.new(20, 150, -1040)},
+            {name = "Statue Garden", pos = Vector3.new(0, 160, -1060), cframe = CFrame.new(0, 160, -1060)},
+        },
+        ["Caves & Caverns"] = {
+            {name = "Overgrowth Caves", pos = Vector3.new(19746.2676, 416.00293, 5403.5752), cframe = CFrame.new(19746.2676, 416.00293, 5403.5752, 0.488031536, -3.30940715e-08, -0.87282598, -3.24267696e-11, 1, -3.79341323e-08, 0.87282598, 1.85413569e-08, 0.488031536)},
+            {name = "Frigid Cavern", pos = Vector3.new(20253.6094, 756.525818, 5772.68555), cframe = CFrame.new(20253.6094, 756.525818, 5772.68555, -0.781508088, 1.85673343e-08, 0.623895109, 5.92671467e-09, 1, -2.23363816e-08, -0.623895109, -1.3758414e-08, -0.781508088)},
+            {name = "Cryogenic Canal", pos = Vector3.new(19958.5176, 917.195923, 5332.59375), cframe = CFrame.new(19958.5176, 917.195923, 5332.59375, 0.758922458, -7.29783434e-09, 0.651180983, -4.58880756e-09, 1, 1.65551253e-08, -0.651180983, -1.55522013e-08, 0.758922458)},
+            {name = "Glacial Grotto", pos = Vector3.new(20003.0273, 1136.42798, 5555.95996), cframe = CFrame.new(20003.0273, 1136.42798, 5555.95996, 0.983130038, -3.94455064e-08, 0.182907909, 3.45229765e-08, 1, 3.0096718e-08, -0.182907909, -2.32744615e-08, 0.983130038)},
+        },
+        ["Other Important Locations"] = {
+            {name = "Crystal Cove Main", pos = Vector3.new(1364, -612, 2472), cframe = CFrame.new(1364, -612, 2472)},
+            {name = "Crystal Cove Deep", pos = Vector3.new(1302, -701, 1604), cframe = CFrame.new(1302, -701, 1604)},
+            {name = "AFK Rewards Platform", pos = Vector3.new(232, 139, 38), cframe = CFrame.new(232, 139, 38)},
+            {name = "Atlantean Storm Center", pos = Vector3.new(-3530, 130, 550), cframe = CFrame.new(-3530, 130, 550)},
+            {name = "Azure Lagoon Main", pos = Vector3.new(1310, 80, 2113), cframe = CFrame.new(1310, 80, 2113)},
+            {name = "Castaway Cliffs Main", pos = Vector3.new(690, 135, -1693), cframe = CFrame.new(690, 135, -1693)},
+            {name = "Lobster Shores Main", pos = Vector3.new(-550, 150, 2640), cframe = CFrame.new(-550, 150, 2640)},
+            {name = "Trade Plaza", pos = Vector3.new(535, 82, 775), cframe = CFrame.new(535, 82, 775)},
+            {name = "Waveborne Main", pos = Vector3.new(360, 90, 780), cframe = CFrame.new(360, 90, 780)},
+            {name = "The Laboratory", pos = Vector3.new(-1785, 130, -485), cframe = CFrame.new(-1785, 130, -485)},
+        }
     },
-    ['Rods'] = {
-        ['Heaven Rod'] = CFrame.new(20025.0508, -467.665955, 7114.40234, -0.9998191, -2.41349773e-10, 0.0190212391, -4.76249762e-10, 1, -1.23448247e-08, -0.0190212391, -1.23516495e-08, -0.9998191),
-        ['Summit Rod'] = CFrame.new(20213.334, 736.668823, 5707.8208, -0.274440169, 3.53429606e-08, 0.961604178, -1.52819659e-08, 1, -4.11156122e-08, -0.961604178, -2.59789772e-08, -0.274440169),
-        ['Kings Rod'] = CFrame.new(1380.83862, -807.198608, -304.22229, -0.692510426, 9.24755454e-08, 0.72140789, 4.86611427e-08, 1, -8.1475676e-08, -0.72140789, -2.13182219e-08, -0.692510426)
-    }
+    
+    -- API Functions
+    getCategoryNames = function()
+        local categories = {}
+        for category, _ in pairs(TeleportSystemV2.gpsData) do
+            table.insert(categories, category)
+        end
+        table.sort(categories)
+        return categories
+    end,
+    
+    getLocationNames = function(category)
+        local locations = {}
+        if TeleportSystemV2.gpsData[category] then
+            for _, location in pairs(TeleportSystemV2.gpsData[category]) do
+                table.insert(locations, location.name)
+            end
+        end
+        table.sort(locations)
+        return locations
+    end,
+    
+    getLocationData = function(category, locationName)
+        if TeleportSystemV2.gpsData[category] then
+            for _, location in pairs(TeleportSystemV2.gpsData[category]) do
+                if location.name == locationName then
+                    return location
+                end
+            end
+        end
+        return nil
+    end,
+    
+    teleportTo = function(category, locationName, method)
+        method = method or "CFrame"
+        local locationData = TeleportSystemV2.getLocationData(category, locationName)
+        
+        if not locationData then
+            return false, "Location not found"
+        end
+        
+        local success, error = pcall(function()
+            local character = game.Players.LocalPlayer.Character
+            if not character then return end
+            local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+            if not humanoidRootPart then return end
+            
+            if method == "CFrame" then
+                humanoidRootPart.CFrame = locationData.cframe
+            elseif method == "Position" then
+                humanoidRootPart.Position = locationData.pos
+            elseif method == "Teleport" then
+                humanoidRootPart.CFrame = CFrame.new(locationData.pos)
+            end
+        end)
+        
+        return success, error
+    end,
+    
+    getStatistics = function()
+        local totalLocations = 0
+        local categoryCount = 0
+        
+        for category, locations in pairs(TeleportSystemV2.gpsData) do
+            categoryCount = categoryCount + 1
+            totalLocations = totalLocations + #locations
+        end
+        
+        return {
+            totalLocations = totalLocations,
+            totalCategories = categoryCount,
+            categories = TeleportSystemV2.getCategoryNames()
+        }
+    end,
+    
+    searchLocations = function(searchTerm)
+        local results = {}
+        searchTerm = string.lower(searchTerm)
+        
+        for category, locations in pairs(TeleportSystemV2.gpsData) do
+            for _, location in pairs(locations) do
+                if string.find(string.lower(location.name), searchTerm) or 
+                   string.find(string.lower(category), searchTerm) then
+                    table.insert(results, {
+                        category = category,
+                        location = location
+                    })
+                end
+            end
+        end
+        
+        return results
+    end,
+    
+    getNearestLocations = function(currentPos, radius)
+        radius = radius or 1000
+        local nearbyLocations = {}
+        
+        for category, locations in pairs(TeleportSystemV2.gpsData) do
+            for _, location in pairs(locations) do
+                local distance = (currentPos - location.pos).Magnitude
+                if distance <= radius then
+                    table.insert(nearbyLocations, {
+                        category = category,
+                        location = location,
+                        distance = distance
+                    })
+                end
+            end
+        end
+        
+        -- Sort by distance
+        table.sort(nearbyLocations, function(a, b)
+            return a.distance < b.distance
+        end)
+        
+        return nearbyLocations
+    end
 }
 
-local ZoneNames = {}
-local RodNames = {}
+-- Initialize function for backward compatibility
+TeleportSystemV2.init = function()
+    return TeleportSystemV2
+end
+
+print("✅ Integrated GPS Teleport System loaded successfully!")
+print("📍 Total locations available:", TeleportSystemV2.getStatistics().totalLocations)
+print("📂 Total categories:", TeleportSystemV2.getStatistics().totalCategories)
+
+-- Initialize variables for visuals
 local RodColors = {}
 local RodMaterials = {}
-
-for i,v in pairs(TeleportLocations['Zones']) do 
-    table.insert(ZoneNames, i) 
-end
-for i,v in pairs(TeleportLocations['Rods']) do 
-    table.insert(RodNames, i) 
-end
 
 --// Custom Functions
 getchar = function()
@@ -700,11 +955,166 @@ local NoPeaksSystemsToggle = ModificationsTab:CreateToggle({
 })
 
 --// Teleports Tab
-TeleportsTab:CreateSection("Legacy Locations")
+TeleportsTab:CreateSection("🌍 Integrated GPS System")
 
--- Add variables for legacy teleport system
-local selectedZone = ZoneNames[1] or ""
-local selectedRod = RodNames[1] or ""
+-- Check if TeleportSystemV2 is available before creating GPS components
+if TeleportSystemV2 and TeleportSystemV2.getCategoryNames then
+    -- Get GPS categories and create dropdown
+    local GPSCategories = TeleportSystemV2.getCategoryNames()
+    local GPSLocationDropdown -- Forward declaration
+    local selectedGPSCategory = GPSCategories[1] or "Moosewood Area"
+    local selectedGPSLocation = ""
+
+    local GPSCategoryDropdown = TeleportsTab:CreateDropdown({
+        Name = "GPS Categories",
+        Options = GPSCategories,
+        CurrentOption = selectedGPSCategory,
+        Flag = "gpscategory",
+        Callback = function(Option)
+            selectedGPSCategory = Option
+            
+            -- Update location dropdown
+            local locations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
+            if #locations > 0 then
+                selectedGPSLocation = locations[1]
+                if GPSLocationDropdown then
+                    local success = pcall(function()
+                        GPSLocationDropdown:Refresh(locations, selectedGPSLocation)
+                    end)
+                    if not success then
+                        print("⚠️ Dropdown refresh failed, using fallback")
+                    end
+                end
+                message("📂 Category: " .. selectedGPSCategory .. " (" .. #locations .. " locations)", 2)
+            else
+                message("❌ No locations found for category: " .. selectedGPSCategory, 2)
+            end
+        end,
+    })
+
+    -- Initial location names
+    local initialLocations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
+    if #initialLocations > 0 then
+        selectedGPSLocation = initialLocations[1]
+    end
+
+    GPSLocationDropdown = TeleportsTab:CreateDropdown({
+        Name = "GPS Locations",
+        Options = initialLocations,
+        CurrentOption = selectedGPSLocation,
+        Flag = "gpslocation",
+        Callback = function(Option)
+            selectedGPSLocation = Option
+            message("📍 Selected: " .. Option, 1)
+        end,
+    })
+
+    -- Add variable for teleport method
+    local selectedTeleportMethod = "CFrame"
+
+    local TeleportMethodDropdown = TeleportsTab:CreateDropdown({
+        Name = "Teleport Method",
+        Options = {"CFrame", "Position", "Teleport"},
+        CurrentOption = selectedTeleportMethod,
+        Flag = "teleportmethod",
+        Callback = function(Option)
+            selectedTeleportMethod = Option
+            message("🔧 Method: " .. Option, 1)
+        end,
+    })
+
+    local GPSTeleportButton = TeleportsTab:CreateButton({
+        Name = "🚀 Teleport to Location",
+        Callback = function()
+            if selectedGPSCategory and selectedGPSLocation then
+                local success, error = TeleportSystemV2.teleportTo(selectedGPSCategory, selectedGPSLocation, selectedTeleportMethod)
+                if success then
+                    message("🌍 Teleported to: " .. selectedGPSLocation, 2)
+                else
+                    message("❌ Teleport failed: " .. tostring(error), 2)
+                end
+            else
+                message("❌ Please select a category and location", 2)
+            end
+        end,
+    })
+
+    TeleportsTab:CreateSection("🔧 GPS Tools")
+
+    local RefreshGPSButton = TeleportsTab:CreateButton({
+        Name = "🔄 Refresh Locations",
+        Callback = function()
+            local locations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
+            if GPSLocationDropdown then
+                local success = pcall(function()
+                    GPSLocationDropdown:Refresh(locations, selectedGPSLocation)
+                end)
+                message("🔄 Refreshed: " .. #locations .. " locations", 1)
+            end
+        end,
+    })
+
+    local NearestLocationsButton = TeleportsTab:CreateButton({
+        Name = "📍 Find Nearest (2km)",
+        Callback = function()
+            local character = game.Players.LocalPlayer.Character
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                local currentPos = character.HumanoidRootPart.Position
+                local nearbyLocations = TeleportSystemV2.getNearestLocations(currentPos, 2000)
+                
+                if #nearbyLocations > 0 then
+                    local message_text = "📍 Nearest locations:\n"
+                    for i = 1, math.min(5, #nearbyLocations) do
+                        local loc = nearbyLocations[i]
+                        message_text = message_text .. string.format("• %s (%dm)\n", 
+                            loc.location.name, math.floor(loc.distance))
+                    end
+                    message(message_text, 4)
+                else
+                    message("❌ No locations found within 2km", 2)
+                end
+            else
+                message("❌ Character not found", 2)
+            end
+        end,
+    })
+
+    local SearchButton = TeleportsTab:CreateButton({
+        Name = "🔍 Search Islands",
+        Callback = function()
+            local results = TeleportSystemV2.searchLocations("island")
+            if #results > 0 then
+                local message_text = "🔍 Island locations:\n"
+                for i = 1, math.min(5, #results) do
+                    local result = results[i]
+                    message_text = message_text .. string.format("• %s (%s)\n", 
+                        result.location.name, result.category)
+                end
+                message(message_text, 4)
+            else
+                message("❌ No island locations found", 2)
+            end
+        end,
+    })
+
+    local StatsButton = TeleportsTab:CreateButton({
+        Name = "📊 GPS Statistics",
+        Callback = function()
+            local stats = TeleportSystemV2.getStatistics()
+            local message_text = string.format("📊 GPS Stats:\n• Total Locations: %d\n• Categories: %d\n• Status: ✅ Online", 
+                stats.totalLocations, stats.totalCategories)
+            message(message_text, 3)
+        end,
+    })
+
+else
+    TeleportsTab:CreateButton({
+        Name = "❌ GPS System Error",
+        Callback = function()
+            message("❌ GPS System unavailable. Please restart script.", 3)
+        end,
+    })
+end
 
 local ZonesDropdown = TeleportsTab:CreateDropdown({
     Name = "Zones",
@@ -752,157 +1162,23 @@ local TeleportToRodButton = TeleportsTab:CreateButton({
     end,
 })
 
-TeleportsTab:CreateSection("GPS System V2 (276 Locations)")
+TeleportsTab:CreateSection("🔧 Teleport Utils")
 
--- Check if TeleportSystemV2 is available before creating GPS components
-if TeleportSystemV2 and TeleportSystemV2.getCategoryNames then
-    -- Get GPS categories and create dropdown
-    local GPSCategories = TeleportSystemV2.getCategoryNames()
-    local GPSLocationDropdown -- Forward declaration
-    local selectedGPSCategory = GPSCategories[1] or "Terrapin Island Area"
-    local selectedGPSLocation = ""
-
-local GPSCategoryDropdown = TeleportsTab:CreateDropdown({
-    Name = "GPS Categories",
-    Options = GPSCategories,
-    CurrentOption = selectedGPSCategory,
-    Flag = "gpscategory",
-    Callback = function(Option)
-        -- Wrap entire callback in protected call for error safety
-        local success, callbackError = pcall(function()
-            print("🔄 GPS Category changed to:", Option)
-            selectedGPSCategory = Option
-            
-            -- Force immediate location update
-            wait(0.1) -- Small delay to ensure dropdown is ready
-            
-            -- Validate TeleportSystemV2 before use
-            if not TeleportSystemV2 or type(TeleportSystemV2.getLocationNames) ~= "function" then
-                message("❌ Teleport system not properly loaded", 3)
-                return
-            end
-            
-            -- Update location dropdown when category changes
-            local locations = TeleportSystemV2.getLocationNames(Option)
-            print("📍 Found", #locations, "locations for category:", Option)
-            
-            if locations and #locations > 0 then
-                -- Set first location immediately
-                selectedGPSLocation = locations[1]
-                
-                if GPSLocationDropdown then
-                    -- Try multiple refresh approaches for better compatibility
-                    local refreshSuccess = false
-                    
-                    -- Method 1: Rayfield V2 Refresh
-                    local success1, error1 = pcall(function()
-                        if GPSLocationDropdown.Refresh and type(GPSLocationDropdown.Refresh) == "function" then
-                            GPSLocationDropdown:Refresh(locations)
-                            refreshSuccess = true
-                        else
-                            error("Refresh method not available")
-                        end
-                    end)
-                    
-                    if success1 then
-                        print("✅ Method 1: Dropdown refreshed successfully with", #locations, "locations")
-                        message("📂 Category: " .. Option .. " (" .. #locations .. " locations)", 2)
-                    else
-                        print("⚠️ Method 1 failed:", tostring(error1))
-                        
-                        -- Method 2: Force update with alternatives
-                        local success2, error2 = pcall(function()
-                            -- Try updating options directly
-                            if GPSLocationDropdown.Options then
-                                GPSLocationDropdown.Options = locations
-                                refreshSuccess = true
-                            else
-                                error("Options property not available")
-                            end
-                        end)
-                        
-                        if success2 then
-                            print("✅ Method 2: Options updated successfully")
-                            message("📂 Category: " .. Option .. " (" .. #locations .. " locations)", 2)
-                        else
-                            print("⚠️ Method 2 also failed:", tostring(error2))
-                            
-                            -- Method 3: Force delayed refresh
-                            spawn(function()
-                                wait(0.5)
-                                local success3, error3 = pcall(function()
-                                    if GPSLocationDropdown and GPSLocationDropdown.Refresh then
-                                        GPSLocationDropdown:Refresh(locations)
-                                    end
-                                end)
-                                if success3 then
-                                    message("✅ Delayed refresh successful for " .. Option, 2)
-                                else
-                                    message("⚠️ Use 🔄 Refresh GPS Locations button to update", 3)
-                                end
-                            end)
-                        end
-                    end
-                else
-                    print("❌ GPSLocationDropdown is nil - dropdown not initialized yet")
-                    message("⚠️ GPS Location dropdown not ready. Please wait and try again.", 3)
-                end
-            else
-                print("❌ No locations found for category:", Option)
-                message("📂 Category: " .. Option .. " (No locations found)", 2)
-            end
-        end)
-        
-        if not success then
-            print("❌ GPS Category Callback Error:", tostring(callbackError))
-            message("❌ GPS refresh error: " .. tostring(callbackError), 5)
-        end
-    end,
-})
-
--- Initial location names
-local initialLocations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
-if #initialLocations > 0 then
-    selectedGPSLocation = initialLocations[1]
-end
-
-GPSLocationDropdown = TeleportsTab:CreateDropdown({
-    Name = "GPS Locations",
-    Options = initialLocations,
-    CurrentOption = initialLocations[1] or "No locations",
-    Flag = "gpslocation",
-    Callback = function(Option)
-        selectedGPSLocation = Option
-        print("📍 GPS Location selected:", Option)
-        
-        -- Show distance when location selected
-        local locations = TeleportSystemV2.getLocationsByCategory(selectedGPSCategory)
-        for _, location in pairs(locations) do
-            if location.name == Option then
-                local distance = TeleportSystemV2.getDistanceToLocation(location)
-                message(string.format("📍 %s\n🗺️ Distance: %.0f studs", location.name, distance), 3)
-                break
-            end
-        end
-    end,
-})
-
--- Add manual refresh button for GPS locations
-local RefreshGPSButton = TeleportsTab:CreateButton({
-    Name = "🔄 Refresh GPS Locations",
+local ForceReturnSpawnButton = TeleportsTab:CreateButton({
+    Name = "🏠 Return to Spawn",
     Callback = function()
-        -- Wrap refresh function in protected call
-        local success, refreshError = pcall(function()
-            print("🔄 Manual GPS refresh triggered for category:", selectedGPSCategory)
-            
-            -- Validate TeleportSystemV2
-            if not TeleportSystemV2 or type(TeleportSystemV2.getLocationNames) ~= "function" then
-                message("❌ Teleport system not properly loaded", 3)
-                return
-            end
-            
-            -- Get fresh locations for current category
-            local locations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
+        local character = game.Players.LocalPlayer.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = CFrame.new(232, 139, 38)
+            message("🏠 Returned to spawn", 2)
+        else
+            message("❌ Character not found", 2)
+        end
+    end,
+})
+
+--// Visuals Tab
+VisualsTab:CreateSection("Rod")
             print("📍 Found", #locations, "locations for refresh")
             
             if locations and #locations > 0 then
