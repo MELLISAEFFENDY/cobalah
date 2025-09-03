@@ -115,12 +115,32 @@ FindRod = function()
     end
 end
 message = function(text, time)
-    if tooltipmessage then tooltipmessage:Remove() end
-    tooltipmessage = require(lp.PlayerGui:WaitForChild("GeneralUIModule")):GiveToolTip(lp, text)
-    task.spawn(function()
-        task.wait(time)
-        if tooltipmessage then tooltipmessage:Remove(); tooltipmessage = nil end
+    local success, result = pcall(function()
+        if tooltipmessage then tooltipmessage:Remove() end
+        
+        -- Try to get GeneralUIModule safely
+        local playerGui = lp.PlayerGui
+        local generalUIModule = playerGui:FindFirstChild("GeneralUIModule")
+        
+        if generalUIModule then
+            tooltipmessage = require(generalUIModule):GiveToolTip(lp, text)
+            task.spawn(function()
+                task.wait(time or 2)
+                if tooltipmessage then 
+                    tooltipmessage:Remove()
+                    tooltipmessage = nil 
+                end
+            end)
+        else
+            -- Fallback: print to console if GeneralUIModule not available
+            print("💬 Message:", text)
+        end
     end)
+    
+    if not success then
+        -- Fallback if anything fails
+        print("💬 Message:", text)
+    end
 end
 
 --// Load Rayfield UI V2 from GitHub (Full Source)
@@ -441,10 +461,35 @@ local GPSCategoryDropdown = TeleportsTab:CreateDropdown({
         print("🔄 GPS Category changed to:", Option)
         selectedGPSCategory = Option
         
-        -- Simple validation and message
+        -- Update GPS locations for selected category
         if TeleportSystemV2 and TeleportSystemV2.getLocationNames then
             local locations = TeleportSystemV2.getLocationNames(Option)
             selectedGPSLocation = locations[1] or ""
+            
+            -- Try to update GPS Location dropdown
+            if GPSLocationDropdown then
+                task.spawn(function()
+                    task.wait(0.1) -- Small delay to ensure dropdown is ready
+                    local success = pcall(function()
+                        -- Try Rayfield refresh method
+                        if GPSLocationDropdown.Refresh then
+                            GPSLocationDropdown:Refresh(locations)
+                        elseif GPSLocationDropdown.UpdateOptions then
+                            GPSLocationDropdown:UpdateOptions(locations)
+                        else
+                            -- Fallback: try to set options directly
+                            GPSLocationDropdown.Options = locations
+                        end
+                    end)
+                    
+                    if success then
+                        print("✅ GPS Location dropdown updated successfully")
+                    else
+                        print("⚠️ Could not auto-update dropdown, use Refresh button")
+                    end
+                end)
+            end
+            
             message("📂 Category: " .. Option .. " (" .. #locations .. " locations)", 2)
             print("📍 Found", #locations, "locations for category:", Option)
         else
@@ -478,7 +523,28 @@ local RefreshGPSButton = TeleportsTab:CreateButton({
         if TeleportSystemV2 and selectedGPSCategory then
             local locations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
             selectedGPSLocation = locations[1] or ""
-            message("✅ GPS refreshed: " .. #locations .. " locations", 2)
+            
+            -- Force update GPS Location dropdown
+            if GPSLocationDropdown then
+                local success = pcall(function()
+                    if GPSLocationDropdown.Refresh then
+                        GPSLocationDropdown:Refresh(locations)
+                    elseif GPSLocationDropdown.UpdateOptions then
+                        GPSLocationDropdown:UpdateOptions(locations)
+                    else
+                        GPSLocationDropdown.Options = locations
+                    end
+                end)
+                
+                if success then
+                    message("✅ GPS refreshed: " .. #locations .. " locations", 2)
+                    print("✅ Dropdown refreshed with", #locations, "locations")
+                else
+                    message("⚠️ Manual refresh needed - restart script", 3)
+                end
+            else
+                message("❌ GPS Location dropdown not found", 3)
+            end
         else
             message("❌ Cannot refresh GPS - system not loaded", 3)
         end
@@ -491,11 +557,53 @@ local DebugGPSButton = TeleportsTab:CreateButton({
     Callback = function()
         if TeleportSystemV2 then
             local categories = TeleportSystemV2.getCategoryNames()
+            local currentLocations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
             local msg = "🔍 GPS Debug:\n📂 Categories: " .. #categories .. 
-                       "\n📍 Current: " .. (selectedGPSCategory or "None")
-            message(msg, 5)
+                       "\n📍 Current Category: " .. (selectedGPSCategory or "None") ..
+                       "\n📍 Locations in Category: " .. #currentLocations ..
+                       "\n📍 Selected Location: " .. (selectedGPSLocation or "None")
+            message(msg, 8)
         else
             message("❌ TeleportSystemV2 not loaded", 3)
+        end
+    end,
+})
+
+-- Alternative method: Quick category selection buttons
+TeleportsTab:CreateSection("Quick Category Selection")
+
+local QuickCategoryButton1 = TeleportsTab:CreateButton({
+    Name = "📍 Terrapin Island Area",
+    Callback = function()
+        selectedGPSCategory = "Terrapin Island Area"
+        if TeleportSystemV2 then
+            local locations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
+            selectedGPSLocation = locations[1] or ""
+            message("📂 Quick Select: Terrapin Island Area (" .. #locations .. " locations)", 3)
+        end
+    end,
+})
+
+local QuickCategoryButton2 = TeleportsTab:CreateButton({
+    Name = "🏛️ Ancient Isle Area", 
+    Callback = function()
+        selectedGPSCategory = "Ancient Isle Area"
+        if TeleportSystemV2 then
+            local locations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
+            selectedGPSLocation = locations[1] or ""
+            message("📂 Quick Select: Ancient Isle Area (" .. #locations .. " locations)", 3)
+        end
+    end,
+})
+
+local QuickCategoryButton3 = TeleportsTab:CreateButton({
+    Name = "🌊 Deep Ocean Areas",
+    Callback = function()
+        selectedGPSCategory = "Deep Ocean Areas"
+        if TeleportSystemV2 then
+            local locations = TeleportSystemV2.getLocationNames(selectedGPSCategory)
+            selectedGPSLocation = locations[1] or ""
+            message("📂 Quick Select: Deep Ocean Areas (" .. #locations .. " locations)", 3)
         end
     end,
 })
